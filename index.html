@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 12px; margin: 0; }
+    .row { display: flex; gap: 8px; margin-bottom: 8px; }
+    input { flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    button { padding: 6px 12px; background: #00875A; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button:disabled { background: #bbb; cursor: not-allowed; }
+    #status { font-size: 0.9em; margin-top: 4px; min-height: 1.2em; font-family: monospace; }
+    .error { color: #DE350B; }
+    .success { color: #00875A; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <input type="text" id="prod" placeholder="ex: spring-boot, python, postgresql..." />
+    <button id="btn" type="button">Ajouter / Mettre à jour</button>
+  </div>
+  <div id="status">Initialisation...</div>
+
+  <script>
+ (async () => {
+  try {
+    const result = await grist.docApi.applyUserActions([
+      ["AddRecord", "TEST", null, { A: "hello" }]
+    ]);
+    console.log("Résultat:", result);
+  } catch (e) {
+    console.error("Erreur:", e);
+  }
+})();
+
+    const btn = document.getElementById('btn');
+    const input = document.getElementById('prod');
+    const status = document.getElementById('status');
+
+    // Cache local des lignes envoyé automatiquement par Grist
+    let currentRecords = [];
+
+    // Réception automatique de l'ensemble des enregistrements de la table liée
+    grist.onRecords((records) => {
+      currentRecords = records;
+      if (status.innerText === "Initialisation...") {
+        status.innerText = `Prêt (${records.length} composant(s) chargé(s)).`;
+      }
+    });
+
+    // Indispensable pour autoriser l'écriture
+    grist.ready({ requiredAccess: 'full' });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    });
+
+    btn.addEventListener('click', async () => {
+      const product = input.value.trim().toLowerCase();
+      if (!product) {
+        status.className = 'error';
+        status.innerText = "Veuillez saisir un nom de composant.";
+        return;
+      }
+
+      btn.disabled = true;
+      status.className = '';
+      status.innerText = `Récupération sur endoflife.date pour "${product}"...`;
+
+      try {
+        // 1. Appel endoflife.date
+        const url = `https://endoflife.date/api/v1/products/${encodeURIComponent(product)}`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+        if (!res.ok) {
+          if (res.status === 404) throw new Error(`Composant "${product}" introuvable sur endoflife.date.`);
+          throw new Error(`Erreur API HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const resObj = data.result || {};
+
+        // 2. Formatage des données
+        const dlaFields = {
+          ID_COMPOSANT: product,
+          NOM_COMPOSANT: String(resObj.label || product),
+          CATEGORIE: resObj.category || null,
+          EOL: resObj.labels?.eol || null,
+          EOES: resObj.labels?.eoes || null,
+          //MAJ_DATE: data.generated_at ? data.generated_at.split('T')[0] : null,
+          MAJ_DATE: data.generated_at ? Math.floor(new Date(data.generated_at).getTime() / 1000) : null,
+          EOL_LIEN: resObj.links?.html || `https://endoflife.date/${product}`
+        };
+
+        // 3. Recherche dans les données déjà en mémoire locale
+        const existingRow = currentRecords.find(r => 
+          r.ID_COMPOSANT && String(r.ID_COMPOSANT).toLowerCase() === product
+        );
+
+        // 4. Enregistrement via selectedTable
+        if (existingRow) {
+          status.innerText = `Mise à jour de la ligne #${existingRow.id}...`;
+          await grist.selectedTable.update({
+            id: existingRow.id,
+            fields: dlaFields
+          });
+          status.className = 'success';
+          status.innerText = `Succès : "${dlaFields.NOM_COMPOSANT}" mis à jour (ligne #${existingRow.id}) !`;
+        } else {
+          status.innerText = `Ajout du nouveau composant...`;
+          await grist.selectedTable.create({
+            fields: dlaFields
+          });
+          status.className = 'success';
+          status.innerText = `Succès : "${dlaFields.NOM_COMPOSANT}" ajouté avec succès !`;
+        }
+
+        input.value = '';
+      } catch (err) {
+        console.error("Erreur widget :", err);
+        status.className = 'error';
+        status.innerText = `Échec : ${err.message || err}`;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
