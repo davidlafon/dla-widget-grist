@@ -15,7 +15,7 @@
 </style>
 </head>
 <body>
-<h1>V3</h1>
+<h1>v4</h1>
 <div class="row">
   <button id="btnInit">Initialiser</button>
   <button id="btnUpdate">Mettre à jour</button>
@@ -176,7 +176,8 @@ btnUpdate.addEventListener('click', async () => {
         const result = data.result || {};
         const generatedAt = data.generated_at || data.generatedAt || '';
         const latest = result.latest || {};
-        const idRelease = `${idComposant}_${latest.name}`;
+        //const idRelease = `${idComposant}_${latest.name}`;
+		const idRelease = `${idComposant}_${latest.name || rel.name}`;
 
         if (existingIds.has(idRelease)) {
           log(`  = ${idComposant} : déjà à jour (${idRelease}).`, 'info');
