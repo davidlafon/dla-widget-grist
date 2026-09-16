@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 12px; margin: 0; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; }
+  button { padding: 8px 14px; background: #00875A; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  button:disabled { background: #bbb; cursor: not-allowed; }
+  #status { font-size: 0.9em; margin-top: 8px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 8px; border-radius: 4px; }
+  .error { color: #DE350B; }
+  .success { color: #00875A; }
+  .info { color: #555; }
+</style>
+</head>
+<body>
+
+<div class="row">
+  <button id="btnInit">Initialiser</button>
+  <button id="btnUpdate">Mettre à jour</button>
+</div>
+<div id="status">Prêt.</div>
+
+<script>
+grist.ready({ requiredAccess: 'full' });
+
+const statusEl = document.getElementById('status');
+const btnInit = document.getElementById('btnInit');
+const btnUpdate = document.getElementById('btnUpdate');
+
+function log(msg, cls) {
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  statusEl.appendChild(line);
+  statusEl.scrollTop = statusEl.scrollHeight;
+}
+
+function clearLog() {
+  statusEl.innerHTML = '';
+}
+
+function setBusy(busy) {
+  btnInit.disabled = busy;
+  btnUpdate.disabled = busy;
+}
+
+// Récupère la liste des composants Open-source depuis la table COMPOSANTS
+async function getOpenSourceComposants() {
+  const composantsTable = grist.getTable('COMPOSANTS');
+  const records = await composantsTable.fetchTable();
+  // records est un objet { id: [...], ID_COMPOSANT: [...], LICENCE: [...] }
+  const result = [];
+  const n = records.id.length;
+  for (let i = 0; i < n; i++) {
+    if (records.LICENCE[i] === 'Open-source') {
+      result.push(records.ID_COMPOSANT[i]);
+    }
+  }
+  return result;
+}
+
+// Récupère tous les ID_RELEASE déjà présents dans VERSIONS (pour éviter les doublons)
+async function getExistingReleaseIds() {
+  const versionsTable = grist.getTable('VERSIONS');
+  const records = await versionsTable.fetchTable();
+  const set = new Set();
+  const n = (records.id || []).length;
+  for (let i = 0; i < n; i++) {
+    set.add(records.ID_RELEASE[i]);
+  }
+  return set;
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  if (!res.ok) {
+    if (res.status === 404) throw new Error(`404 - non trouvé (${url})`);
+    throw new Error(`HTTP ${res.status} (${url})`);
+  }
+  return res.json();
+}
+
+// ---------- INITIALISER ----------
+btnInit.addEventListener('click', async () => {
+  clearLog();
+  setBusy(true);
+  log('Récupération des composants Open-source...', 'info');
+
+  try {
+    const composants = await getOpenSourceComposants();
+    log(`${composants.length} composant(s) Open-source trouvé(s).`, 'info');
+
+    const existingIds = await getExistingReleaseIds();
+    const actions = [];
+
+    for (const idComposant of composants) {
+      try {
+        log(`→ ${idComposant} : appel API...`);
+        const data = await fetchJson(`https://endoflife.date/api/v1/products/${encodeURIComponent(idComposant)}`);
+        const result = data.result || {};
+        const generatedAt = data.generated_at || data.generatedAt || '';
+        const latest = result.latest || {};
+        const releases = (result.releases || []).slice(0, 5);
+
+        if (releases.length === 0) {
+          log(`  ⚠ Aucune release trouvée pour ${idComposant}.`, 'error');
+          continue;
+        }
+
+        for (const rel of releases) {
+          const idRelease = `${idComposant}_${latest.name}`;
+          // On ajoute quand même les 5 dernières releases; si tu veux un ID unique par release
+          // (et non par "latest"), dis-le moi, la logique demandée génère le même ID_RELEASE
+          // pour les 5 lignes initiales (basé sur latest.name), ce qui écrasera les doublons
+          // potentiels lors du "Mettre à jour". Je le signale plus bas.
+          if (existingIds.has(idRelease) && rel !== releases[0]) {
+            // on laisse passer volontairement, cf. remarque ci-dessous
+          }
+
+          actions.push([
+            'AddRecord',
+            'VERSIONS',
+            null,
+            {
+              ID_RELEASE: idRelease,
+              CREATION_DATE: generatedAt,
+              RELEASE_VERSION: rel.name || '',
+              RELEASE_DATE: dateToTimestamp(rel.releaseDate),
+              RELEASE_EOL_DATE: dateToTimestamp(rel.eolFrom),
+              RELEASE_EOES_DATE: dateToTimestamp(rel.eoesFrom),
+              LATEST_RELEASE_NAME: latest.name || '',
+              LATEST_RELEASE_DATE: dateToTimestamp(latest.date),
+              LATEST_RELEASE_LIEN: latest.link || ''
+            }
+          ]);
+        }
+
+        log(`  ✓ ${releases.length} release(s) préparée(s) pour ${idComposant}.`, 'success');
+
+      } catch (err) {
+        log(`  ✗ Erreur pour ${idComposant} : ${err.message}`, 'error');
+      }
+    }
+
+    if (actions.length > 0) {
+      log(`Envoi de ${actions.length} enregistrement(s) vers VERSIONS...`, 'info');
+      await grist.docApi.applyUserActions(actions);
+      log(`✓ Terminé : ${actions.length} enregistrement(s) créé(s).`, 'success');
+    } else {
+      log('Aucun enregistrement à créer.', 'info');
+    }
+
+  } catch (err) {
+    log(`Erreur générale : ${err.message}`, 'error');
+  } finally {
+    setBusy(false);
+  }
+});
+
+// ---------- METTRE À JOUR ----------
+btnUpdate.addEventListener('click', async () => {
+  clearLog();
+  setBusy(true);
+  log('Récupération des composants Open-source...', 'info');
+
+  try {
+    const composants = await getOpenSourceComposants();
+    log(`${composants.length} composant(s) Open-source trouvé(s).`, 'info');
+
+    const existingIds = await getExistingReleaseIds();
+    const actions = [];
+
+    for (const idComposant of composants) {
+      try {
+        log(`→ ${idComposant} : appel API (latest)...`);
+        const data = await fetchJson(`https://endoflife.date/api/v1/products/${encodeURIComponent(idComposant)}/releases/latest`);
+        const result = data.result || {};
+        const generatedAt = data.generated_at || data.generatedAt || '';
+        const latest = result.latest || {};
+        const idRelease = `${idComposant}_${latest.name}`;
+
+        if (existingIds.has(idRelease)) {
+          log(`  = ${idComposant} : déjà à jour (${idRelease}).`, 'info');
+          continue;
+        }
+
+        actions.push([
+          'AddRecord',
+          'VERSIONS',
+          null,
+          {
+            ID_RELEASE: idRelease,
+            CREATION_DATE: generatedAt,
+            RELEASE_VERSION: result.name || '',
+            RELEASE_DATE: dateToTimestamp(result.releaseDate),
+            RELEASE_EOL_DATE: dateToTimestamp(result.eolFrom),
+            RELEASE_EOES_DATE: dateToTimestamp(result.eoesFrom),
+            LATEST_RELEASE_NAME: latest.name || '',
+            LATEST_RELEASE_DATE: dateToTimestamp(latest.date),
+            LATEST_RELEASE_LIEN: latest.link || ''
+          }
+        ]);
+
+        log(`  ✓ Nouvelle release détectée pour ${idComposant} : ${idRelease}`, 'success');
+        existingIds.add(idRelease); // évite doublon si jamais 2 composants génèrent le même id
+
+      } catch (err) {
+        log(`  ✗ Erreur pour ${idComposant} : ${err.message}`, 'error');
+      }
+    }
+
+    if (actions.length > 0) {
+      log(`Envoi de ${actions.length} nouvel(le)(s) enregistrement(s)...`, 'info');
+      await grist.docApi.applyUserActions(actions);
+      log(`✓ Terminé : ${actions.length} enregistrement(s) créé(s).`, 'success');
+    } else {
+      log('Rien à mettre à jour, tout est déjà à jour.', 'success');
+    }
+
+  } catch (err) {
+    log(`Erreur générale : ${err.message}`, 'error');
+  } finally {
+    setBusy(false);
+  }
+});
+
+// Convertit une date "YYYY-MM-DD" (ou null/false) en timestamp Unix (secondes),
+// format attendu par les colonnes Date de Grist.
+function dateToTimestamp(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  const d = new Date(dateStr + 'T00:00:00Z');
+  if (isNaN(d.getTime())) return null;
+  return Math.floor(d.getTime() / 1000);
+}
+</script>
+</body>
+</html>
