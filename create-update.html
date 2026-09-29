@@ -51,9 +51,9 @@ async function getOpenSourceComposants() {
   const result = [];
   const n = records.id.length;
   for (let i = 0; i < n; i++) {
-    if (records.LICENCE[i] === 'Open-source') {
+    //if (records.LICENCE[i] === 'Open-source') {
       result.push(records.ID_COMPOSANT[i]);
-    }
+    //}
   }
   return result;
 }
