@@ -377,14 +377,13 @@
                     </table>
                 </div>
             </section>
-            <div class="legend"><span>Niveau 5 : tout va bien | Niveau 2 : attention | Niveau 1 : critique | autres valeurs :
-                    inconnu.</span>
+            <div class="legend"><span>Niveau 1 : critique | Niveau 2 : attention | Niveau 5 : OK  autres valeurs : inconnu</span>
             </div>
         </main>
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7.3";
+				const VERSION = "0.7.4";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
@@ -423,7 +422,7 @@
                         case 2:
                             return ["warning", "Attention"];
                         case 5:
-                            return ["ok", "Tout va bien"];
+                            return ["ok", "OK"];
                         default:
                             return ["unknown", "Inconnu"];
                     }
