@@ -448,16 +448,16 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     }
 
     // Fonction pour générer un tableau groupé
-    function generateGroupedTable(data, groupBy, groupName, tbodyId) {
-        // Support the original three-argument calls (third argument is the tbody id).
+        function generateGroupedTable(data, groupBy, groupName, tbodyId) {
         if (tbodyId === undefined) tbodyId = groupName;
-        // Trier les données par groupe puis par version
+
+        const cmpStr = (x, y) => {
+            const s1 = x === null || x === undefined ? "" : String(x);
+            const s2 = y === null || y === undefined ? "" : String(y);
+            return s1.localeCompare(s2, "fr");
+        };
+
         const sortedData = [...data].sort((a, b) => {
-            const cmpStr = (x, y) => {
-                const s1 = x === null || x === undefined ? "" : String(x);
-                const s2 = y === null || y === undefined ? "" : String(y);
-                return s1.localeCompare(s2, "fr");
-            };
             const groupCmp = cmpStr(a[groupBy], b[groupBy]);
             if (groupCmp !== 0) return groupCmp;
             return cmpStr(a.CURRENT_VERSION_COMPOSANT, b.CURRENT_VERSION_COMPOSANT);
@@ -467,63 +467,66 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         tbody.innerHTML = "";
 
         let currentGroup = null;
-        let groupRowSpan = 0;
+        let firstRowOfCurrentGroup = null;
+        let groupRowCount = 0;
 
-        sortedData.forEach((row, index) => {
+        sortedData.forEach(row => {
             const groupValue = row[groupBy];
+
             if (groupValue !== currentGroup) {
-                // Nouveau groupe : ajouter une ligne avec cellule fusionnée
-                if (currentGroup !== null) {
-                    // Fermer le groupe précédent
-                    const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
-                    const firstRowOfGroup = tbody.lastElementChild;
-                    firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
+                // Poser le rowSpan sur la PREMIÈRE ligne du groupe précédent
+                if (firstRowOfCurrentGroup !== null) {
+                    firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
                 }
-                // Commencer un nouveau groupe
+                // Nouveau groupe
                 currentGroup = groupValue;
+                groupRowCount = 0;
+
                 const tr = document.createElement("tr");
+                tr.className = getEolAlertClass(row.ALERTE);
+
                 const tdGroup = document.createElement("td");
-                tdGroup.textContent = groupValue;
+                tdGroup.textContent = groupValue === null || groupValue === undefined ? "(vide)" : String(groupValue);
                 tdGroup.style.fontWeight = "bold";
                 tr.appendChild(tdGroup);
+
+                tbody.appendChild(tr);
+                firstRowOfCurrentGroup = tr;
+            } else {
+                const tr = document.createElement("tr");
+                tr.className = getEolAlertClass(row.ALERTE);
                 tbody.appendChild(tr);
             }
 
-            // Ajouter les autres cellules
+            groupRowCount++;
+
+            // On complète la ligne courante (la dernière ajoutée au tbody)
             const tr = tbody.lastElementChild;
-			tr.className = getEolAlertClass(row.ALERTE);
-			
+
             const tdComposant = document.createElement("td");
             tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
             tr.appendChild(tdComposant);
 
-            // Version actuelle
-			const tdVersion = document.createElement("td");
+            const tdVersion = document.createElement("td");
             tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
             tr.appendChild(tdVersion);
 
-             // Date EOL
-			const tdEol = document.createElement("td");
+            const tdEol = document.createElement("td");
             tdEol.textContent = row.RELEASE_EOL_DATE_AFFICHEE;
             tr.appendChild(tdEol);
 
-             // Version cible
-			const tdVersionCible = document.createElement("td");
+            const tdVersionCible = document.createElement("td");
             tdVersionCible.textContent = row.$RELEASE_CIBLE;
             tr.appendChild(tdVersionCible);
 
-             // EOL Version cible
-			const tdEolCible = document.createElement("td");
+            const tdEolCible = document.createElement("td");
             tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
             tr.appendChild(tdEolCible);
-
         });
 
         // Fermer le dernier groupe
-        if (currentGroup !== null) {
-            const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
-            const firstRowOfGroup = tbody.lastElementChild;
-            firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
+        if (firstRowOfCurrentGroup !== null) {
+            firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
         }
     }
 
