@@ -385,8 +385,8 @@
             (() => {
                 "use strict";
 				const VERSION = "0.7";
-				const today = new Date();
-				document.getElementById('versionDoc').innerText = "Version ${VERSION} - "+ today.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+				const dToday = new Date();
+				document.getElementById('versionDoc').innerText = "Version ${VERSION} - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
                 const $ = (id) => document.getElementById(id);
                 const text = (value) => (value === null || value === undefined || value === "" ? "—" : String(value));
                 const first = (row, names) => {
