@@ -310,7 +310,7 @@
             <nav class="tabs" aria-label="Vues">
                 <button class="tab active" data-view="by-app">Par application</button
                 ><button class="tab" data-view="by-component">Par composant</button
-                ><button class="tab" data-view="critical">EOL critiques (ALERTE = 5)</button>
+                ><button class="tab" data-view="critical">EOL critiques (Niveau 1)</button>
             </nav>
             <section id="by-app" class="view active">
                 <div class="view-title">
@@ -384,7 +384,7 @@
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7";
+				const VERSION = "0.7.1";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
