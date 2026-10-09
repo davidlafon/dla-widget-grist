@@ -220,20 +220,32 @@
 
             // Ajouter les autres cellules
             const tr = tbody.lastElementChild;
+			tr.className = getEolAlertClass(row.ALERTE);
+			
             const tdComposant = document.createElement("td");
-            tdComposant.textContent = groupBy === "application" ? row.composant : row.application;
+            tdComposant.textContent = groupBy === "NOM_APPLICATION" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
             tr.appendChild(tdComposant);
 
-            const tdVersion = document.createElement("td");
-            tdVersion.textContent = row.version;
+            // Version actuelle
+			const tdVersion = document.createElement("td");
+            tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
             tr.appendChild(tdVersion);
 
-            const tdEol = document.createElement("td");
-            tdEol.textContent = formatDate(row.eol_date);
-            tdEol.className = getEolClass(row.eol_date);
+             // Date EOL
+			const tdEol = document.createElement("td");
+            tdEol.textContent = row.RELEASE_EOL_DATE_AFFICHEE;
             tr.appendChild(tdEol);
 
-            // Ajoutez ici les autres colonnes si nécessaire
+             // Version cible
+			const tdVersionCible = document.createElement("td");
+            tdVersionCible.textContent = row.$RELEASE_CIBLE;
+            tr.appendChild(tdVersionCible);
+
+             // EOL Version cible
+			const tdEolCible = document.createElement("td");
+            tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
+            tr.appendChild(tdEolCible);
+
         });
 
         // Fermer le dernier groupe
