@@ -133,12 +133,11 @@
 
 <script>
 
-	console.log("$table_rows:", $table_rows);
-    console.log("Première ligne:", $table_rows[0]);
-    console.log("Noms des colonnes:", Object.keys($table_rows[0]));
-	
-    // Récupérer les données de la table Grist
-    const tableData = $table_rows;
+	// Fonction pour récupérer les données de la table
+    async function getTableData() {
+        const tableData = await fetchSelectedTable();
+        return tableData;
+    }
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
