@@ -67,7 +67,7 @@
 <body>
   <div style="font-family: sans-serif; padding: 1em;">
     <h1>Tableau de bord des EOL RDR4</h1>
-	<h2>Version 0.5</h2>
+	<h2>Version 0.6</h2>
 	
 	
 	
@@ -135,12 +135,8 @@
 
 <script>
 
-	// Fonction pour récupérer les données de la table
-    async function getTableData() {
-        const tableData = await fetchSelectedTable();
-        return tableData;
-    }
-	
+	// Récupérer les données de la table via l'API Grist
+    const tableData = grist.docApi.fetchSelectedTable();	
 	
 
     // Fonction pour formater une date en DD/MM/YYYY
