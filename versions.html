@@ -199,10 +199,10 @@
                 vertical-align: middle;
                 border-bottom: 2px solid #cbd5d9;
             }
-            tbody tr.status-critical, tbody tr td.status-critical {
+            tbody tr.status-critical, td.status-critical {
                 border-left-color: var(--danger);
             }
-            tbody tr.status-warning, tbody tr td.status-warning {
+            tbody tr.status-warning, td.status-warning {
                 border-left-color: var(--warn);
             }
             tbody tr.status-ok {
@@ -384,7 +384,7 @@
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7.2";
+				const VERSION = "0.7.3";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
