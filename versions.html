@@ -422,18 +422,6 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         return diffDays >= 0 ? diffDays : "Dépassée";
     }
 
-    // Fonction pour déterminer la classe CSS en fonction de la date EOL **** DEPRECATED ****
-    function getEolClass(eolDateStr) {
-        if (!eolDateStr) return "eol-ok";
-        const eolDate = new Date(eolDateStr);
-        const today = new Date();
-        const criticalThreshold = new Date();
-        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
-
-        if (eolDate <= today) return "eol-critical";
-        if (eolDate <= criticalThreshold) return "eol-warning";
-        return "eol-ok";
-    }
 
     // Fonction pour déterminer la classe CSS en fonction de l'alerte
     function getEolAlertClass(alertLvl) {
@@ -523,7 +511,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             tr.appendChild(tdEol);
 
             const tdVersionCible = document.createElement("td");
-            tdVersionCible.textContent = row.$RELEASE_CIBLE;
+            tdVersionCible.textContent = row.RELEASE_CIBLE;
             tr.appendChild(tdVersionCible);
 
             const tdEolCible = document.createElement("td");
