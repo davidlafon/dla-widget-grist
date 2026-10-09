@@ -135,10 +135,11 @@
 
 <script>
 
-	// Récupérer les données de la table via l'API Grist
-    //const tableData = grist.docApi.fetchSelectedTable();	
+	// Récupérer les données de la table 
+    const tableData = grist.fetchSelectedTable()	
 	
-	// Réception automatique de l'ensemble des enregistrements de la table liée
+/*	// Réception automatique de l'ensemble des enregistrements de la table liée.
+	const tableData = await getOpenSourceRELATION();
     grist.onRecords((tableData) => {
       currentRecords = tableData;
       if (status.innerText === "Initialisation...") {
@@ -148,7 +149,7 @@
 	
 	// Indispensable pour autoriser l'écriture
     grist.ready({ requiredAccess: 'full' });
-	
+*/	
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
