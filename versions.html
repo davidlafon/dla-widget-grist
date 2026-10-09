@@ -469,11 +469,11 @@
                         tr.append(groupCell);
                     }
 					
-                    tr.append(cell(groupBy === "app" ? record.component : record.app), "status-" + status[0]);
-                    tr.append(cell(record.current), "status-" + status[0]);
-                    tr.append(cell(formatDate(record.eol)), "status-" + status[0]);
-                    tr.append(cell(record.target), "status-" + status[0]);
-                    tr.append(cell(formatDate(record.targetEol)), "status-" + status[0]);
+                    tr.append(cell(groupBy === "app" ? record.component : record.app).classList.add("status-" + status[0]));
+                    tr.append(cell(record.current).classList.add("status-" + status[0]));
+                    tr.append(cell(formatDate(record.eol)).classList.add("status-" + status[0]));
+                    tr.append(cell(record.target).classList.add("status-" + status[0]));
+                    tr.append(cell(formatDate(record.targetEol)).classList.add("status-" + status[0]));
                     const badge = document.createElement("td");
                     const span = document.createElement("span");
                     span.className = "status " + status[0];
