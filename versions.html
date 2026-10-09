@@ -1,590 +1,493 @@
-<!doctype html>
-<html lang="fr">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Versions - EOL RDR4</title>
-        <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-        <style>
-            :root {
-                --ink: #17212b;
-                --muted: #66727d;
-                --line: #dfe5e9;
-                --panel: #fff;
-                --wash: #f5f7f8;
-                --accent: #0f766e;
-                --accent-soft: #dff4ef;
-                --danger: #b42318;
-                --danger-soft: #fde8e7;
-                --warn: #a15c00;
-                --warn-soft: #fff1d6;
-                --shadow: 0 8px 24px rgba(23, 33, 43, 0.08);
-            }
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                background: linear-gradient(135deg, #f7faf9 0%, #eef3f4 100%);
-                color: var(--ink);
-                font-family:
-                    ui-sans-serif,
-                    system-ui,
-                    -apple-system,
-                    "Segoe UI",
-                    sans-serif;
-                font-size: 13px;
-            }
-            .shell {
-                padding: 18px;
-                max-width: 1500px;
-                margin: 0 auto;
-            }
-            .hero {
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-between;
-                gap: 16px;
-                margin-bottom: 16px;
-            }
-            .eyebrow {
-                margin: 0 0 5px;
-                text-transform: uppercase;
-                letter-spacing: 0.13em;
-                font-size: 10px;
-                font-weight: 800;
-                color: var(--accent);
-            }
-            h1 {
-                margin: 0;
-                font-size: clamp(20px, 3vw, 30px);
-                letter-spacing: -0.03em;
-                line-height: 1.1;
-            }
-            .subtitle {
-                margin: 7px 0 0;
-                color: var(--muted);
-            }
-            .version {
-                white-space: nowrap;
-                color: var(--muted);
-                border: 1px solid var(--line);
-                background: rgba(255, 255, 255, 0.65);
-                border-radius: 999px;
-                padding: 7px 10px;
-                font-size: 11px;
-            }
-            .summary {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 10px;
-                margin-bottom: 16px;
-            }
-            .metric {
-                background: var(--panel);
-                border: 1px solid var(--line);
-                border-radius: 12px;
-                padding: 5px;
-                box-shadow: var(--shadow);
-				text-align: center;
-            }
-            .metric-label {
-                color: var(--muted);
-                font-size: 11px;
-            }
-            .metric-value {
-                display: block;
-                font-size: 23px;
-                font-weight: 800;
-                letter-spacing: -0.04em;
-            }
-            .metric-value.alert {
-                color: var(--danger);
-            }
-            .tabs {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 7px;
-                margin-bottom: 11px;
-            }
-            .tab {
-                border: 1px solid var(--line);
-                background: rgba(255, 255, 255, 0.75);
-                color: var(--ink);
-                padding: 8px 11px;
-                border-radius: 8px;
-                cursor: pointer;
-                font: inherit;
-                font-weight: 700;
-            }
-            .tab:hover,
-            .tab.active {
-                color: var(--accent);
-                border-color: #9bd4ca;
-                background: var(--accent-soft);
-            }
-            .view {
-                display: none;
-            }
-            .view.active {
-                display: block;
-            }
-            .view-title {
-                display: flex;
-                justify-content: space-between;
-                align-items: baseline;
-                gap: 12px;
-                margin: 0 0 9px;
-            }
-            h2 {
-                margin: 0;
-                font-size: 15px;
-            }
-            .count {
-                color: var(--muted);
-                font-size: 11px;
-            }
-            .table-wrap {
-                overflow: auto;
-                background: var(--panel);
-                border: 1px solid var(--line);
-                border-radius: 12px;
-                box-shadow: var(--shadow);
-            }
-            table {
-                width: 100%;
-                min-width: 720px;
-                border-collapse: separate;
-                border-spacing: 0;
-            }
-            th {
-                position: sticky;
-                top: 0;
-                z-index: 1;
-                background: #f1f5f5;
-                color: #53616b;
-                text-align: left;
-                text-transform: uppercase;
-                letter-spacing: 0.06em;
-                font-size: 10px;
-                white-space: nowrap;
-            }
-            th,
-            td {
-                padding: 5px 10px;
-                border-bottom: 1px solid var(--line);
-                vertical-align: middle;
-            }
-            tbody tr {
-                cursor: pointer;
-                transition: background 0.15s ease;
-                border-left: 4px solid transparent;
-            }
-            tbody tr:hover,
-            tbody tr:focus {
-                background: #f4fbf9;
-                outline: none;
-            }
-            tbody tr:last-child td {
-                border-bottom: 0;
-            }
-            td:first-child,
-            th:first-child {
-                padding-left: 15px;
-            }
-            .group-cell {
-                font-weight: 800;
-                color: #24333d;
-                min-width: 150px;
-                vertical-align: middle;
-                border-bottom: 2px solid #cbd5d9;
-            }
-            tbody tr.status-critical, td.status-critical {
-                border-color: var(--danger);
-				border-width: 2px;
-				background: var(--danger-soft);
-            }
-            tbody tr.status-warning, td.status-warning {
-                border-color: var(--warn);
-				border-width: 2px;
-				background: var(--warn-soft);
-            }
-            tbody tr.status-ok {
-                border-color: var(--accent);
-            }
-            tbody tr.status-unknown {
-                border-color: #98a2b3;
-            }
-            .status {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 2px 7px;
-                border-radius: 999px;
-                font-size: 11px;
-                font-weight: 800;
-                white-space: nowrap;
-            }
-            .status::before {
-                content: "";
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: currentColor;
-            }
-            .status.critical {
-                color: var(--danger);
-                background: var(--danger-soft);
-            }
-            .status.warning {
-                color: var(--warn);
-                background: var(--warn-soft);
-            }
-            .status.ok {
-                color: var(--accent);
-                background: var(--accent-soft);
-            }
-            .status.unknown {
-                color: #667085;
-                background: #eef0f2;
-            }
-            .empty,
-            .error {
-                padding: 25px;
-                text-align: center;
-                color: var(--muted);
-            }
-            .error {
-                color: var(--danger);
-            }
-            .legend {
-                margin-top: 10px;
-                color: var(--muted);
-                font-size: 11px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-            @media (max-width: 650px) {
-                .shell {
-                    padding: 12px;
+<html>
+<head>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <style>
+ /* Styles pour les tableaux */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-family: Arial, sans-serif;
+    }
+    .custom-table th, .custom-table td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+    }
+    .custom-table th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .custom-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .custom-table tr:hover {
+        background-color: #e6e6e6;
+    }
+
+    /* Styles pour les boutons */
+    .button-group {
+        margin: 20px 0;
+    }
+    .button-group button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .button-group button:hover {
+        background-color: #45a049;
+    }
+
+    /* Styles pour les onglets */
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Style pour les dates EOL critiques */
+    .eol-critical {
+        color: red;
+        font-weight: bold;
+    }
+    .eol-warning {
+        color: orange;
+        font-weight: bold;
+    }
+    .eol-ok {
+        color: green;
+    }
+
+
+    /* Filtres multi-sélection */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 12px;
+        margin: 20px 0;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fafafa;
+        font-family: Arial, sans-serif;
+    }
+    .filter-control {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 220px;
+    }
+    .filter-control label {
+        font-weight: bold;
+        color: #333;
+    }
+    .filter-control select {
+        min-height: 72px;
+        padding: 4px;
+        border: 1px solid #bbb;
+        border-radius: 4px;
+        background: white;
+    }
+    .filter-count {
+        color: #666;
+        font-size: 0.9em;
+        font-weight: normal;
+    }
+    .filter-bar .clear-filters {
+        padding: 8px 14px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .filter-bar .clear-filters:hover {
+        background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div style="font-family: sans-serif; padding: 1em;">
+    <h1>Tableau de bord des EOL RDR4</h1>
+	<h2>Version 0.6.1</h2>
+	
+	
+	
+<!-- Filtres : une sélection vide signifie « toutes les valeurs ». -->
+<div class="filter-bar" id="filters">
+    <div class="filter-control">
+        <label for="application-filter">Applications <span class="filter-count" id="application-filter-count">(0 sélectionnée)</span></label>
+        <select id="application-filter" multiple size="4" aria-label="Filtrer par application"></select>
+    </div>
+    <div class="filter-control">
+        <label for="component-filter">Composants <span class="filter-count" id="component-filter-count">(0 sélectionné)</span></label>
+        <select id="component-filter" multiple size="4" aria-label="Filtrer par composant"></select>
+    </div>
+    <button type="button" class="clear-filters" id="clear-filters">Tout réinitialiser</button>
+    <span class="filter-count" id="filtered-row-count" aria-live="polite">0 ligne affichée</span>
+</div>
+
+    <!-- Boutons pour basculer entre les vues -->
+<div class="button-group">
+    <button onclick="showTab('by-app')">Par Application</button>
+    <button onclick="showTab('by-composant')">Par Composant</button>
+    <button onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
+</div>
+
+<!-- Tableau groupé par application -->
+<div id="by-app" class="tab-content active">
+    <h3>Tableau groupé par Application</h3>
+    <table class="custom-table" id="table-by-app">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-by-app"></tbody>
+    </table>
+</div>
+
+<!-- Tableau groupé par composant -->
+<div id="by-composant" class="tab-content">
+    <h3>Tableau groupé par Composant</h3>
+    <table class="custom-table" id="table-by-composant">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-by-composant"></tbody>
+    </table>
+</div>
+
+<!-- Tableau EOL critique -->
+<div id="eol-critical" class="tab-content">
+    <h3>Applications/Composants avec EOL critique</h3>
+    <table class="custom-table" id="table-eol-critical">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+                <th>Jours restants</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-eol-critical"></tbody>
+    </table>
+</div>
+
+<script>
+
+	// Récupérer les données de la table 
+    grist.ready({ requiredAccess: "read table" });
+    const tableData = grist.fetchSelectedTable()	
+
+    // Données et état des filtres. Les noms de champs correspondent aux colonnes Grist.
+    let currentRecords = [];
+    const APPLICATION_FIELD = "NOM_APPLICATION";
+    const COMPONENT_FIELD = "NOM_COMPOSANT";
+    const selectedApplications = new Set();
+    const selectedComponents = new Set();
+
+    function displayValue(value) {
+        return value === null || value === undefined || value === "" ? "(vide)" : String(value);
+    }
+
+    function valuesFor(records, field) {
+        return [...new Set(records.map(row => displayValue(row[field])))].sort((a, b) => a.localeCompare(b, "fr"));
+    }
+
+    function selectedValues(select) {
+        return new Set([...select.selectedOptions].map(option => option.value));
+    }
+
+    function refreshFilterOptions(records) {
+        const configs = [
+            ["application-filter", APPLICATION_FIELD, selectedApplications],
+            ["component-filter", COMPONENT_FIELD, selectedComponents]
+        ];
+        configs.forEach(([id, field, selected]) => {
+            const select = document.getElementById(id);
+            const available = valuesFor(records, field);
+            const stillSelected = new Set([...selected].filter(value => available.includes(value)));
+            selected.clear();
+            stillSelected.forEach(value => selected.add(value));
+            select.innerHTML = "";
+            available.forEach(value => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.textContent = value;
+                option.selected = stillSelected.has(value);
+                select.appendChild(option);
+            });
+        });
+        updateFilterCounts();
+    }
+
+    function updateFilterCounts() {
+        const appCount = selectedApplications.size;
+        const componentCount = selectedComponents.size;
+        document.getElementById("application-filter-count").textContent = `(${appCount} sélectionnée${appCount > 1 ? "s" : ""})`;
+        document.getElementById("component-filter-count").textContent = `(${componentCount} sélectionné${componentCount > 1 ? "s" : ""})`;
+    }
+
+    function filteredRecords(records) {
+        return records.filter(row =>
+            (!selectedApplications.size || selectedApplications.has(displayValue(row[APPLICATION_FIELD]))) &&
+            (!selectedComponents.size || selectedComponents.has(displayValue(row[COMPONENT_FIELD])))
+        );
+    }
+
+    function renderFilteredTables() {
+        const filtered = filteredRecords(currentRecords);
+        generateGroupedTable(filtered, "application", "tbody-by-app");
+        generateGroupedTable(filtered, "composant", "tbody-by-composant");
+        generateEolCriticalTable(filtered);
+        const count = filtered.length;
+        document.getElementById("filtered-row-count").textContent = `(${count} ligne${count > 1 ? "s" : ""} affichée${count > 1 ? "s" : ""})`;
+    }
+
+    function setRecords(records) {
+        currentRecords = Array.isArray(records) ? records : [];
+        refreshFilterOptions(currentRecords);
+        renderFilteredTables();
+    }
+
+    function init() {
+        ["application-filter", "component-filter"].forEach(id => {
+            document.getElementById(id).addEventListener("change", event => {
+                const target = event.target;
+                const selected = selectedValues(target);
+                (id === "application-filter" ? selectedApplications : selectedComponents).clear();
+                selected.forEach(value => (id === "application-filter" ? selectedApplications : selectedComponents).add(value));
+                updateFilterCounts();
+                renderFilteredTables();
+            });
+        });
+        document.getElementById("clear-filters").addEventListener("click", () => {
+            selectedApplications.clear();
+            selectedComponents.clear();
+            refreshFilterOptions(currentRecords);
+            renderFilteredTables();
+        });
+    }
+
+    // Réception des changements de la table liée, sans supprimer le chargement initial.
+    if (grist.onRecords) {
+        grist.onRecords(records => setRecords(records));
+    }
+	
+/*	// Réception automatique de l'ensemble des enregistrements de la table liée.
+	const tableData = await getOpenSourceRELATION();
+    grist.onRecords((tableData) => {
+      currentRecords = tableData;
+      if (status.innerText === "Initialisation...") {
+        console.log(`Prêt (${tableData.length} enregistrement(s) chargé(s)).`);
+      }
+    });
+	
+	// Indispensable pour autoriser l'écriture
+    grist.ready({ requiredAccess: 'full' });
+*/	
+
+    // Fonction pour formater une date en DD/MM/YYYY
+    function formatDate(dateStr) {
+        if (!dateStr) return "N/A";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("fr-FR");
+    }
+
+    // Fonction pour calculer les jours restants avant EOL
+    function getDaysLeft(eolDateStr) {
+        if (!eolDateStr) return "N/A";
+        const eolDate = new Date(eolDateStr);
+        const today = new Date();
+        const diffTime = eolDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 ? diffDays : "Dépassée";
+    }
+
+    // Fonction pour déterminer la classe CSS en fonction de la date EOL **** DEPRECATED ****
+    function getEolClass(eolDateStr) {
+        if (!eolDateStr) return "eol-ok";
+        const eolDate = new Date(eolDateStr);
+        const today = new Date();
+        const criticalThreshold = new Date();
+        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
+
+        if (eolDate <= today) return "eol-critical";
+        if (eolDate <= criticalThreshold) return "eol-warning";
+        return "eol-ok";
+    }
+
+    // Fonction pour déterminer la classe CSS en fonction de l'alerte
+    function getEolAlertClass(alertLvl) {
+      switch(alertLvl) {
+        case 1 :
+          return "eol-critical"
+        case 2 :
+          return "eol-warning"
+        default:
+          return"eol-ok"
+      }
+    }
+
+    // Fonction pour générer un tableau groupé
+    function generateGroupedTable(data, groupBy, groupName, tbodyId) {
+        // Support the original three-argument calls (third argument is the tbody id).
+        if (tbodyId === undefined) tbodyId = groupName;
+        // Trier les données par groupe puis par version
+        const sortedData = [...data].sort((a, b) => {
+            if (a[groupBy] < b[groupBy]) return -1;
+            if (a[groupBy] > b[groupBy]) return 1;
+            return a.version.localeCompare(b.version);
+        });
+
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = "";
+
+        let currentGroup = null;
+        let groupRowSpan = 0;
+
+        sortedData.forEach((row, index) => {
+            const groupValue = row[groupBy];
+            if (groupValue !== currentGroup) {
+                // Nouveau groupe : ajouter une ligne avec cellule fusionnée
+                if (currentGroup !== null) {
+                    // Fermer le groupe précédent
+                    const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
+                    const firstRowOfGroup = tbody.lastElementChild;
+                    firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
                 }
-                .hero {
-                    display: block;
-                }
-                .version {
-                    display: inline-block;
-                    margin-top: 10px;
-                }
-                .summary {
-                    grid-template-columns: 1fr 1fr;
-                }
-                .metric:last-child {
-                    grid-column: span 2;
-                }
+                // Commencer un nouveau groupe
+                currentGroup = groupValue;
+                const tr = document.createElement("tr");
+                const tdGroup = document.createElement("td");
+                tdGroup.textContent = groupValue;
+                tdGroup.style.fontWeight = "bold";
+                tr.appendChild(tdGroup);
+                tbody.appendChild(tr);
             }
-        </style>
-    </head>
-    <body>
-        <main class="shell">
-            <header class="hero">
-                <div>
-                    <p class="eyebrow">Grist · pilotage des versions</p>
-                    <h1>Tableau de bord des EOL RDR4</h1>
-                    <p class="subtitle">
-                        Une vue opérationnelle des composants à maintenir et des échéances à anticiper.
-                    </p>
-                </div>
-                <span id="versionDoc" class="version"></span>
-            </header>
-            <section class="summary" aria-label="Synthèse">
-                <div class="metric">
-                    <span class="metric-label">Enregistrements</span
-                    ><strong id="metric-total" class="metric-value">—</strong>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">EOL critiques</span
-                    ><strong id="metric-critical" class="metric-value alert">—</strong>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Applications couvertes</span
-                    ><strong id="metric-apps" class="metric-value">—</strong>
-                </div>
-            </section>
-            <nav class="tabs" aria-label="Vues">
-                <button class="tab active" data-view="by-app">Par application</button
-                ><button class="tab" data-view="by-component">Par composant</button
-                ><button class="tab" data-view="critical">EOL en danger</button>
-            </nav>
-            <section id="by-app" class="view active">
-                <div class="view-title">
-                    <h2>Versions groupées par application</h2>
-                    <span id="count-app" class="count"></span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Application</th>
-                                <th>Composant</th>
-                                <th>Version actuelle</th>
-                                <th>Date EOL</th>
-                                <th>Version cible</th>
-                                <th>EOL cible</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-app"></tbody>
-                    </table>
-                </div>
-            </section>
-            <section id="by-component" class="view">
-                <div class="view-title">
-                    <h2>Versions groupées par composant</h2>
-                    <span id="count-component" class="count"></span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Composant</th>
-                                <th>Application</th>
-                                <th>Version actuelle</th>
-                                <th>Date EOL</th>
-                                <th>Version cible</th>
-                                <th>EOL cible</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-component"></tbody>
-                    </table>
-                </div>
-            </section>
-            <section id="critical" class="view">
-                <div class="view-title">
-                    <h2>Échéances à traiter</h2>
-                    <span id="count-critical" class="count"></span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Application</th>
-                                <th>Composant</th>
-                                <th>Version actuelle</th>
-                                <th>Date EOL</th>
-                                <th>Jours restants</th>
-                                <th>Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-critical"></tbody>
-                    </table>
-                </div>
-            </section>
-            <div class="legend"><span>Niveau 1 : critique | Niveau 2 : attention | Niveau 5 : OK | autres valeurs : inconnu</span>
-            </div>
-        </main>
-        <script>
-            (() => {
-                "use strict";
-				const VERSION = "0.9.2";
-				const dToday = new Date();
-				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
-				
-                const $ = (id) => document.getElementById(id);
-                const text = (value) => (value === null || value === undefined || value === "" ? "—" : String(value));
-                const first = (row, names) => {
-                    for (const name of names)
-                        if (row[name] !== undefined && row[name] !== null && row[name] !== "") return row[name];
-                    return "";
-                };
-                const dateValue = (value) => {
-                    if (!value) return null;
-                    const d =
-                        value instanceof Date
-                            ? new Date(value)
-                            : new Date(typeof value === "number" ? value * 1000 : value);
-                    return Number.isNaN(d.getTime()) ? null : d;
-                };
-                const formatDate = (value) => {
-                    const d = dateValue(value);
-                    return d ? d.toLocaleDateString("fr-FR") : "—";
-                };
-                const daysLeft = (value) => {
-                    const d = dateValue(value);
-                    if (!d) return null;
-                    return Math.ceil((d.getTime() - Date.now()) / 86400000);
-                };
-                const alertLevel = (value) => {
-                    const n = Number(value);
-                    return Number.isFinite(n) ? n : null;
-                };
-                const statusFor = (value) => {
-                    switch (alertLevel(value)) {
-                        case 1:
-                            return ["critical", "Critique"];
-                        case 2:
-                            return ["warning", "Attention"];
-                        case 5:
-                            return ["ok", "OK"];
-                        default:
-                            return ["unknown", "Inconnu"];
-                    }
-                };
-                const normalise = (raw) => ({
-                    raw,
-                    id: raw.id,
-                    app: first(raw, ["NOM_APPLICATION", "application", "Application"]),
-                    component: first(raw, ["NOM_COMPOSANT", "composant", "component", "Composant"]),
-                    current: first(raw, ["CURRENT_VERSION_COMPOSANT", "current_version", "version"]),
-                    eol: first(raw, ["RELEASE_EOL_DATE_AFFICHEE", "RELEASE_EOL_DATE", "eol_date", "EOL_DATE"]),
-                    target: first(raw, ["$RELEASE_CIBLE", "RELEASE_CIBLE", "target_version"]),
-                    targetEol: first(raw, ["RELEASE_CIBLE_DATE", "target_eol"]),
-                    alert: first(raw, ["ALERTE", "alert"]),
-                });
-                let records = [];
-                function select(record) {
-                    if (record && record.id !== undefined && window.grist && typeof grist.setSelectedRow === "function")
-                        grist.setSelectedRow(record.id);
-                }
-                function cell(value, className) {
-					//console.log ("in cell(%s, %s)", value, className);
-                    const td = document.createElement("td");
-                    td.textContent = text(value);
-                    if (className) {
-						//console.log ("in className : %s)", className);
-						td.className = className;
-					}
-                    return td;
-                }
-                function rowFor(record, groupBy, groupSize) {
-                    const tr = document.createElement("tr");
-                    tr.tabIndex = 0;
-                    tr.addEventListener("click", () => select(record.raw));
-                    tr.addEventListener("keydown", (e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            select(record.raw);
-                        }
-                    });
-                    const status = statusFor(record.alert);
-                    //tr.classList.add("status-" + status[0]);
-                    const group = groupBy === "app" ? record.app : record.component;
-                    if (groupSize > 0) {
-                        const groupCell = cell(group, "group-cell");
-                        if (groupSize > 1) groupCell.rowSpan = groupSize;
-                        tr.append(groupCell);
-                    }
-					const myStatus = "status-" + status[0];
-					//console.log(myStatus);
-                    tr.append(cell(groupBy === "app" ? record.component : record.app, myStatus));
-                    tr.append(cell(record.current, myStatus));
-                    tr.append(cell(formatDate(record.eol), myStatus));
-                    tr.append(cell(record.target, myStatus));
-                    tr.append(cell(formatDate(record.targetEol), myStatus));
-                    const badge = document.createElement("td");
-                    const span = document.createElement("span");
-                    span.className = "status " + status[0];
-                    span.textContent = status[1];
-                    badge.append(span);
-                    tr.append(badge);
-                    return tr;
-                }
-                function renderGrouped(list, groupBy, tbodyId, countId) {
-                    const sorted = [...list].sort(
-                        (a, b) =>
-                            String(groupBy === "app" ? a.app : a.component).localeCompare(
-                                String(groupBy === "app" ? b.app : b.component),
-                                "fr"
-                            ) || String(a.current).localeCompare(String(b.current), "fr")
-                    );
-                    const tbody = $(tbodyId);
-                    tbody.replaceChildren();
-                    for (let i = 0; i < sorted.length; ) {
-                        const groupValue = groupBy === "app" ? sorted[i].app : sorted[i].component;
-                        let end = i + 1;
-                        while (
-                            end < sorted.length &&
-                            (groupBy === "app" ? sorted[end].app : sorted[end].component) === groupValue
-                        )
-                            end++;
-                        sorted
-                            .slice(i, end)
-                            .forEach((record, offset) =>
-                                tbody.append(rowFor(record, groupBy, offset === 0 ? end - i : 0))
-                            );
-                        i = end;
-                    }
-                    $(countId).textContent = sorted.length + " ligne(s)";
-                    if (!sorted.length)
-                        tbody.innerHTML =
-                            '<tr><td colspan="7" class="empty">Aucun enregistrement à afficher.</td></tr>';
-                }
-                function renderCritical(list) {
-                    const critical = list.filter((r) => (alertLevel(r.alert) === 1 || alertLevel(r.alert) === 2 ));
-                    const tbody = $("tbody-critical");
-                    tbody.replaceChildren();
-                    critical.forEach((r) => {
-                        const tr = document.createElement("tr");
-                        tr.tabIndex = 0;
-                        tr.addEventListener("click", () => select(r.raw));
-                        tr.addEventListener("keydown", (e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                select(r.raw);
-                            }
-                        });
-                        const status = statusFor(r.alert);
-                        tr.classList.add("status-" + status[0]);
-                        tr.append(
-                            cell(r.app, "group-cell"),
-                            cell(r.component),
-                            cell(r.current),
-                            cell(formatDate(r.eol))
-                        );
-                        const d = daysLeft(r.eol);
-                        tr.append(cell(d === null ? "—" : d < 0 ? "Dépassée" : d + " jour(s)"));
-                        const badge = document.createElement("td");
-                        const span = document.createElement("span");
-                        span.className = "status " + status[0];
-                        span.textContent = status[1];
-                        badge.append(span);
-                        tr.append(badge);
-                        tbody.append(tr);
-                    });
-                    $("count-critical").textContent = critical.length + " ligne(s)";
-                    if (!critical.length)
-                        tbody.innerHTML =
-                            '<tr><td colspan="6" class="empty">Aucune EOL critique (ALERTE = 5) dans les données reçues.</td></tr>';
-                }
-                function render(rawRecords) {
-                    records = (Array.isArray(rawRecords) ? rawRecords : []).map(normalise);
-                    const critical = records.filter((r) => alertLevel(r.alert) === 5);
-                    $("metric-total").textContent = records.length;
-                    $("metric-critical").textContent = critical.length;
-                    $("metric-apps").textContent = new Set(records.map((r) => r.app).filter(Boolean)).size;
-                    renderGrouped(records, "app", "tbody-app", "count-app");
-                    renderGrouped(records, "component", "tbody-component", "count-component");
-                    renderCritical(records);
-                }
-                document.querySelectorAll(".tab").forEach((button) =>
-                    button.addEventListener("click", () => {
-                        document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === button));
-                        document
-                            .querySelectorAll(".view")
-                            .forEach((v) => v.classList.toggle("active", v.id === button.dataset.view));
-                    })
-                );
-                function showError(message) {
-                    $("tbody-app").innerHTML = '<tr><td colspan="7" class="error">' + message + "</td></tr>";
-                }
-                if (!window.grist || typeof grist.ready !== "function" || typeof grist.onRecords !== "function") {
-                    showError("API Grist indisponible. Vérifiez le chargement de grist-plugin-api.js.");
-                    return;
-                }
-                grist.ready({ requiredAccess: "read table" });
-                grist.onRecords((rows) => render(rows));
-            })();
-        </script>
-    </body>
+
+            // Ajouter les autres cellules
+            const tr = tbody.lastElementChild;
+			tr.className = getEolAlertClass(row.ALERTE);
+			
+            const tdComposant = document.createElement("td");
+            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
+            tr.appendChild(tdComposant);
+
+            // Version actuelle
+			const tdVersion = document.createElement("td");
+            tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+            tr.appendChild(tdVersion);
+
+             // Date EOL
+			const tdEol = document.createElement("td");
+            tdEol.textContent = row.RELEASE_EOL_DATE_AFFICHEE;
+            tr.appendChild(tdEol);
+
+             // Version cible
+			const tdVersionCible = document.createElement("td");
+            tdVersionCible.textContent = row.$RELEASE_CIBLE;
+            tr.appendChild(tdVersionCible);
+
+             // EOL Version cible
+			const tdEolCible = document.createElement("td");
+            tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
+            tr.appendChild(tdEolCible);
+
+        });
+
+        // Fermer le dernier groupe
+        if (currentGroup !== null) {
+            const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
+            const firstRowOfGroup = tbody.lastElementChild;
+            firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
+        }
+    }
+
+    // Fonction pour générer le tableau EOL critique
+    function generateEolCriticalTable(data) {
+        const today = new Date();
+        const criticalThreshold = new Date();
+        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
+
+        const criticalData = data.filter(row => {
+            if (!row.eol_date) return false;
+            const eolDate = new Date(row.eol_date);
+            return eolDate <= criticalThreshold;
+        });
+
+        const tbody = document.getElementById("tbody-eol-critical");
+        tbody.innerHTML = "";
+        criticalData.forEach(row => {
+            const tr = document.createElement("tr");
+
+            const tdApp = document.createElement("td");
+            tdApp.textContent = row.NOM_APPLICATION;
+            tr.appendChild(tdApp);
+
+            const tdComposant = document.createElement("td");
+            tdComposant.textContent = row.NOM_COMPOSANT;
+            tr.appendChild(tdComposant);
+
+            const tdCurrVersion = document.createElement("td");
+            tdCurrVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+            tr.appendChild(tdCurrVersion);
+
+            const tdCurrEol = document.createElement("td");
+            tdCurrEol.textContent = formatDate(row.RELEASE_EOL_DATE_AFFICHEE);
+            // tdCurrEol.className = getEolClass(row.eol_date);
+            tr.appendChild(tdCurrEol);
+
+            const tdDaysLeft = document.createElement("td");
+            tdDaysLeft.textContent = getDaysLeft(row.eol_date);
+            tr.appendChild(tdDaysLeft);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Fonction pour afficher un onglet
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // --- Initialisation ---
+    document.addEventListener("DOMContentLoaded", init);
+    if (tableData && typeof tableData.then === "function") {
+        tableData.then(setRecords).catch(() => {
+            document.body.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger les données. Essayez avec <code>data</code> au lieu de <code>table</code>.</p>";
+        });
+    } else if (Array.isArray(tableData)) {
+        setRecords(tableData);
+    } else {
+        document.body.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger les données. Essayez avec <code>data</code> au lieu de <code>table</code>.</p>";
+    }
+</script>
+  </div>
+</body>
 </html>
