@@ -232,7 +232,7 @@
 			tr.className = getEolAlertClass(row.ALERTE);
 			
             const tdComposant = document.createElement("td");
-            tdComposant.textContent = groupBy === "NOM_APPLICATION" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
+            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
             tr.appendChild(tdComposant);
 
             // Version actuelle
@@ -315,14 +315,14 @@
         document.getElementById(tabId).classList.add('active');
     }
 
-    // Initialiser les tableaux au chargement
-    async function init() {
-        const tableData = await getTableData();
-        generateGroupedTable(tableData, "application", "Application", "tbody-by-app");
-        generateGroupedTable(tableData, "composant", "Composant", "tbody-by-composant");
+    // --- Initialisation ---
+    if (tableData) {
+        generateGroupedTable(tableData, "application", "tbody-by-app");
+        generateGroupedTable(tableData, "composant", "tbody-by-composant");
         generateEolCriticalTable(tableData);
+    } else {
+        document.body.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger les données. Essayez avec <code>data</code> au lieu de <code>table</code>.</p>";
     }
-
     // Appeler init au chargement de la page
     document.addEventListener('DOMContentLoaded', init);
 </script>
