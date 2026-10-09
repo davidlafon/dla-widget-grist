@@ -432,41 +432,27 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
     // Fonction pour générer le tableau EOL critique
     function generateEolCriticalTable(data) {
-        const today = new Date();
-        const criticalThreshold = new Date();
-        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
-
-        const criticalData = data.filter(row => {
-            if (!row.eol_date) return false;
-            const eolDate = new Date(row.eol_date);
-            return eolDate <= criticalThreshold;
-        });
+        const criticalData = data.filter(row => Number(row.ALERTE) === 1 || Number(row.ALERTE) === 2);
 
         const tbody = document.getElementById("tbody-eol-critical");
         tbody.innerHTML = "";
         criticalData.forEach(row => {
             const tr = document.createElement("tr");
+            tr.className = getEolAlertClass(row.ALERTE);
 
-            const tdApp = document.createElement("td");
-            tdApp.textContent = row.NOM_APPLICATION;
-            tr.appendChild(tdApp);
+            const addCell = (text) => {
+                const td = document.createElement("td");
+                td.textContent = text === null || text === undefined ? "" : String(text);
+                tr.appendChild(td);
+            };
 
-            const tdComposant = document.createElement("td");
-            tdComposant.textContent = row.NOM_COMPOSANT;
-            tr.appendChild(tdComposant);
-
-            const tdCurrVersion = document.createElement("td");
-            tdCurrVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
-            tr.appendChild(tdCurrVersion);
-
-            const tdCurrEol = document.createElement("td");
-            tdCurrEol.textContent = formatDate(row.RELEASE_EOL_DATE_AFFICHEE);
-            // tdCurrEol.className = getEolClass(row.eol_date);
-            tr.appendChild(tdCurrEol);
-
-            const tdDaysLeft = document.createElement("td");
-            tdDaysLeft.textContent = getDaysLeft(row.eol_date);
-            tr.appendChild(tdDaysLeft);
+            addCell(row.NOM_APPLICATION);
+            addCell(row.NOM_COMPOSANT);
+            addCell(row.CURRENT_VERSION_COMPOSANT);
+            addCell(row.RELEASE_EOL_DATE_AFFICHEE);
+            addCell(row.$RELEASE_CIBLE);
+            addCell(formatDate(row.RELEASE_CIBLE_DATE));
+            addCell(Number(row.ALERTE) === 1 ? "Dépassée" : "< 4 mois");
 
             tbody.appendChild(tr);
         });
@@ -480,16 +466,31 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         document.getElementById(tabId).classList.add('active');
     }
 
-    // --- Initialisation ---
+   // --- Initialisation ---
     document.addEventListener("DOMContentLoaded", init);
-    if (tableData && typeof tableData.then === "function") {
-        tableData.then(setRecords).catch(() => {
-            document.body.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger les données. Essayez avec <code>data</code> au lieu de <code>table</code>.</p>";
-        });
-    } else if (Array.isArray(tableData)) {
-        setRecords(tableData);
-    } else {
-        document.body.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger les données. Essayez avec <code>data</code> au lieu de <code>table</code>.</p>";
+
+    function normalizeRows(raw) {
+        // Format "columns" : { col1: [...], col2: [...] } → tableau de lignes
+        if (raw && !Array.isArray(raw) && typeof raw === "object") {
+            const cols = Object.keys(raw);
+            if (cols.length && Array.isArray(raw[cols[0]])) {
+                return raw[cols[0]].map((_, i) => {
+                    const row = {};
+                    cols.forEach(c => row[c] = raw[c][i]);
+                    return row;
+                });
+            }
+            return [raw]; // ligne unique transmise comme objet
+        }
+        return Array.isArray(raw) ? raw : [];
+    }
+
+    if (typeof tableData?.then === "function") {
+        tableData.then(d => setRecords(normalizeRows(d)))
+                 .catch(err => console.error("Chargement Grist :", err));
+    }
+    if (grist.onRecords) {
+        grist.onRecords(records => setRecords(normalizeRows(records)));
     }
 </script>
   </div>
