@@ -138,6 +138,8 @@
         const tableData = await fetchSelectedTable();
         return tableData;
     }
+	
+	
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
@@ -293,11 +295,15 @@
     }
 
     // Initialiser les tableaux au chargement
-    document.addEventListener('DOMContentLoaded', () => {
+    async function init() {
+        const tableData = await getTableData();
         generateGroupedTable(tableData, "application", "Application", "tbody-by-app");
         generateGroupedTable(tableData, "composant", "Composant", "tbody-by-composant");
         generateEolCriticalTable(tableData);
-    });
+    }
+
+    // Appeler init au chargement de la page
+    document.addEventListener('DOMContentLoaded', init);
 </script>
   </div>
 </body>
