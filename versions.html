@@ -200,16 +200,18 @@
                 border-bottom: 2px solid #cbd5d9;
             }
             tbody tr.status-critical, td.status-critical {
-                border-left-color: var(--danger);
+                border-color: var(--danger);
+				border-width: 2px;
             }
             tbody tr.status-warning, td.status-warning {
-                border-left-color: var(--warn);
+                border-color: var(--warn);
+				border-width: 2px;
             }
             tbody tr.status-ok {
-                border-left-color: var(--accent);
+                border-color: var(--accent);
             }
             tbody tr.status-unknown {
-                border-left-color: #98a2b3;
+                border-color: #98a2b3;
             }
             .status {
                 display: inline-flex;
@@ -383,7 +385,7 @@
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7.4";
+				const VERSION = "0.7.5";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
@@ -444,11 +446,11 @@
                         grist.setSelectedRow(record.id);
                 }
                 function cell(value, className) {
-					console.log ("in cell(%s, %s)", value, className);
+					//console.log ("in cell(%s, %s)", value, className);
                     const td = document.createElement("td");
                     td.textContent = text(value);
                     if (className) {
-						console.log ("in className : %s)", className);
+						//console.log ("in className : %s)", className);
 						td.className = className;
 					}
                     return td;
@@ -472,8 +474,8 @@
                         tr.append(groupCell);
                     }
 					const myStatus = "status-" + status[0];
-					console.log(myStatus)
-                    tr.append(cell(groupBy === "app" ? record.component : record.app));
+					//console.log(myStatus);
+                    tr.append(cell(groupBy === "app" ? record.component : record.app, myStatus));
                     tr.append(cell(record.current, myStatus));
                     tr.append(cell(formatDate(record.eol), myStatus));
                     tr.append(cell(record.target, myStatus));
