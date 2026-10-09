@@ -384,7 +384,7 @@
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7.1";
+				const VERSION = "0.7.2";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
@@ -445,9 +445,13 @@
                         grist.setSelectedRow(record.id);
                 }
                 function cell(value, className) {
+					console.log ("in cell(%s, %s)", value, className);
                     const td = document.createElement("td");
                     td.textContent = text(value);
-                    if (className) td.className = className;
+                    if (className) {
+						console.log ("in className : %s)", className);
+						td.className = className;
+					}
                     return td;
                 }
                 function rowFor(record, groupBy, groupSize) {
@@ -468,12 +472,13 @@
                         if (groupSize > 1) groupCell.rowSpan = groupSize;
                         tr.append(groupCell);
                     }
-					
-                    tr.append(cell(groupBy === "app" ? record.component : record.app).classList.add("status-" + status[0]));
-                    tr.append(cell(record.current).classList.add("status-" + status[0]));
-                    tr.append(cell(formatDate(record.eol)).classList.add("status-" + status[0]));
-                    tr.append(cell(record.target).classList.add("status-" + status[0]));
-                    tr.append(cell(formatDate(record.targetEol)).classList.add("status-" + status[0]));
+					const myStatus = "status-" + status[0];
+					console.log(myStatus)
+                    tr.append(cell(groupBy === "app" ? record.component : record.app));
+                    tr.append(cell(record.current, myStatus));
+                    tr.append(cell(formatDate(record.eol), myStatus));
+                    tr.append(cell(record.target, myStatus));
+                    tr.append(cell(formatDate(record.targetEol), myStatus));
                     const badge = document.createElement("td");
                     const span = document.createElement("span");
                     span.className = "status " + status[0];
