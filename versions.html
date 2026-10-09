@@ -202,10 +202,12 @@
             tbody tr.status-critical, td.status-critical {
                 border-color: var(--danger);
 				border-width: 2px;
+				background: var(--danger-soft);
             }
             tbody tr.status-warning, td.status-warning {
                 border-color: var(--warn);
 				border-width: 2px;
+				background: var(--warn-soft);
             }
             tbody tr.status-ok {
                 border-color: var(--accent);
@@ -385,7 +387,7 @@
         <script>
             (() => {
                 "use strict";
-				const VERSION = "0.7.5";
+				const VERSION = "0.9.0";
 				const dToday = new Date();
 				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 				
