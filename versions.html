@@ -114,8 +114,16 @@
 </head>
 <body>
   <div style="font-family: sans-serif; padding: 1em;">
-    <h1>Tableau de bord des EOL RDR4</h1>
-	<h2>Version 0.6.1</h2>
+    <header class="hero">
+		<div>
+			<p class="eyebrow">Grist · pilotage des versions</p>
+			<h1>Tableau de bord des EOL RDR4</h1>
+			<p class="subtitle">
+				Une vue opérationnelle des composants à maintenir et des échéances à anticiper.
+			</p>
+		</div>
+		<span id="versionDoc" class="version"></span>
+	</header>
 	
 	
 	
@@ -196,7 +204,9 @@
 </div>
 
 <script>
-
+const VERSION = "0.9.3";
+const dToday = new Date();
+document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 	// Récupérer les données de la table 
     grist.ready({ requiredAccess: "read table" });
     const tableData = grist.fetchSelectedTable()	
@@ -296,18 +306,7 @@
         grist.onRecords(records => setRecords(records));
     }
 	
-/*	// Réception automatique de l'ensemble des enregistrements de la table liée.
-	const tableData = await getOpenSourceRELATION();
-    grist.onRecords((tableData) => {
-      currentRecords = tableData;
-      if (status.innerText === "Initialisation...") {
-        console.log(`Prêt (${tableData.length} enregistrement(s) chargé(s)).`);
-      }
-    });
-	
-	// Indispensable pour autoriser l'écriture
-    grist.ready({ requiredAccess: 'full' });
-*/	
+
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
@@ -357,9 +356,14 @@
         if (tbodyId === undefined) tbodyId = groupName;
         // Trier les données par groupe puis par version
         const sortedData = [...data].sort((a, b) => {
-            if (a[groupBy] < b[groupBy]) return -1;
-            if (a[groupBy] > b[groupBy]) return 1;
-            return a.version.localeCompare(b.version);
+            const cmpStr = (x, y) => {
+                const s1 = x === null || x === undefined ? "" : String(x);
+                const s2 = y === null || y === undefined ? "" : String(y);
+                return s1.localeCompare(s2, "fr");
+            };
+            const groupCmp = cmpStr(a[groupBy], b[groupBy]);
+            if (groupCmp !== 0) return groupCmp;
+            return cmpStr(a.CURRENT_VERSION_COMPOSANT, b.CURRENT_VERSION_COMPOSANT);
         });
 
         const tbody = document.getElementById(tbodyId);
