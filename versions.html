@@ -2,6 +2,103 @@
 <head>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
+  :root {
+                --ink: #17212b;
+                --muted: #66727d;
+                --line: #dfe5e9;
+                --panel: #fff;
+                --wash: #f5f7f8;
+                --accent: #0f766e;
+                --accent-soft: #dff4ef;
+                --danger: #b42318;
+                --danger-soft: #fde8e7;
+                --warn: #a15c00;
+                --warn-soft: #fff1d6;
+                --shadow: 0 8px 24px rgba(23, 33, 43, 0.08);
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                background: linear-gradient(135deg, #f7faf9 0%, #eef3f4 100%);
+                color: var(--ink);
+                font-family:
+                    ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    "Segoe UI",
+                    sans-serif;
+                font-size: 13px;
+            }
+            .shell {
+                padding: 18px;
+                max-width: 1500px;
+                margin: 0 auto;
+            }
+            .hero {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+            .eyebrow {
+                margin: 0 0 5px;
+                text-transform: uppercase;
+                letter-spacing: 0.13em;
+                font-size: 10px;
+                font-weight: 800;
+                color: var(--accent);
+            }
+            h1 {
+                margin: 0;
+                font-size: clamp(20px, 3vw, 30px);
+                letter-spacing: -0.03em;
+                line-height: 1.1;
+            }
+            .subtitle {
+                margin: 7px 0 0;
+                color: var(--muted);
+            }
+            .version {
+                white-space: nowrap;
+                color: var(--muted);
+                border: 1px solid var(--line);
+                background: rgba(255, 255, 255, 0.65);
+                border-radius: 999px;
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+            .summary {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            .metric {
+                background: var(--panel);
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                padding: 5px;
+                box-shadow: var(--shadow);
+				text-align: center;
+            }
+            .metric-label {
+                color: var(--muted);
+                font-size: 11px;
+            }
+            .metric-value {
+                display: block;
+                font-size: 23px;
+                font-weight: 800;
+                letter-spacing: -0.04em;
+            }
+            .metric-value.alert {
+                color: var(--danger);
+            }
+  
+  
  /* Styles pour les tableaux */
     .custom-table {
         width: 100%;
