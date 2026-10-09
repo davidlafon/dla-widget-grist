@@ -450,6 +450,13 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     // Fonction pour générer un tableau groupé
         function generateGroupedTable(data, groupBy, groupName, tbodyId) {
         if (tbodyId === undefined) tbodyId = groupName;
+		
+		// Mapping des clés logiques vers les vrais champs Grist
+        const GROUP_FIELDS = {
+            application: "NOM_APPLICATION",
+            composant: "NOM_COMPOSANT"
+        };
+        const groupField = GROUP_FIELDS[groupBy] || groupBy;
 
         const cmpStr = (x, y) => {
             const s1 = x === null || x === undefined ? "" : String(x);
@@ -458,7 +465,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         };
 
         const sortedData = [...data].sort((a, b) => {
-            const groupCmp = cmpStr(a[groupBy], b[groupBy]);
+            const groupCmp = cmpStr(a[groupField], b[groupField]);
             if (groupCmp !== 0) return groupCmp;
             return cmpStr(a.CURRENT_VERSION_COMPOSANT, b.CURRENT_VERSION_COMPOSANT);
         });
@@ -471,7 +478,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         let groupRowCount = 0;
 
         sortedData.forEach(row => {
-            const groupValue = row[groupBy];
+            const groupValue = row[groupField];
 
             if (groupValue !== currentGroup) {
                 // Poser le rowSpan sur la PREMIÈRE ligne du groupe précédent
