@@ -1,0 +1,300 @@
+<html>
+<head>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <style>
+ /* Styles pour les tableaux */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-family: Arial, sans-serif;
+    }
+    .custom-table th, .custom-table td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+    }
+    .custom-table th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .custom-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .custom-table tr:hover {
+        background-color: #e6e6e6;
+    }
+
+    /* Styles pour les boutons */
+    .button-group {
+        margin: 20px 0;
+    }
+    .button-group button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .button-group button:hover {
+        background-color: #45a049;
+    }
+
+    /* Styles pour les onglets */
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Style pour les dates EOL critiques */
+    .eol-critical {
+        color: red;
+        font-weight: bold;
+    }
+    .eol-warning {
+        color: orange;
+        font-weight: bold;
+    }
+    .eol-ok {
+        color: green;
+    }
+  </style>
+</head>
+<body>
+  <div style="font-family: sans-serif; padding: 1em;">
+    <h2>
+      Tableau de bord des EOL RDR4
+    </h2>
+    <!-- Boutons pour basculer entre les vues -->
+<div class="button-group">
+    <button onclick="showTab('by-app')">Par Application</button>
+    <button onclick="showTab('by-composant')">Par Composant</button>
+    <button onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
+</div>
+
+<!-- Tableau groupé par application -->
+<div id="by-app" class="tab-content active">
+    <h3>Tableau groupé par Application</h3>
+    <table class="custom-table" id="table-by-app">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-by-app"></tbody>
+    </table>
+</div>
+
+<!-- Tableau groupé par composant -->
+<div id="by-composant" class="tab-content">
+    <h3>Tableau groupé par Composant</h3>
+    <table class="custom-table" id="table-by-composant">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-by-composant"></tbody>
+    </table>
+</div>
+
+<!-- Tableau EOL critique -->
+<div id="eol-critical" class="tab-content">
+    <h3>Applications/Composants avec EOL critique</h3>
+    <table class="custom-table" id="table-eol-critical">
+        <thead>
+            <tr>
+                <th>Application</th>
+                <th>Composant</th>
+                <th>Version actuelle</th>
+                <th>Date EOL</th>
+                <th>Version cible</th>
+                <th>Date EOL cible</th>
+                <th>Jours restants</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-eol-critical"></tbody>
+    </table>
+</div>
+
+<script>
+    // Récupérer les données de la table Grist
+    const tableData = $table_rows;
+
+    // Fonction pour formater une date en DD/MM/YYYY
+    function formatDate(dateStr) {
+        if (!dateStr) return "N/A";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("fr-FR");
+    }
+
+    // Fonction pour calculer les jours restants avant EOL
+    function getDaysLeft(eolDateStr) {
+        if (!eolDateStr) return "N/A";
+        const eolDate = new Date(eolDateStr);
+        const today = new Date();
+        const diffTime = eolDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 ? diffDays : "Dépassée";
+    }
+
+    // Fonction pour déterminer la classe CSS en fonction de la date EOL **** DEPRECATED ****
+    function getEolClass(eolDateStr) {
+        if (!eolDateStr) return "eol-ok";
+        const eolDate = new Date(eolDateStr);
+        const today = new Date();
+        const criticalThreshold = new Date();
+        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
+
+        if (eolDate <= today) return "eol-critical";
+        if (eolDate <= criticalThreshold) return "eol-warning";
+        return "eol-ok";
+    }
+
+    // Fonction pour déterminer la classe CSS en fonction de l'alerte
+    function getEolAlertClass(alertLvl) {
+      switch(alertLvl) {
+        case 1 :
+          return "eol-critical"
+        case 2 :
+          return "eol-warning"
+        default:
+          return"eol-ok"
+      }
+    }
+
+    // Fonction pour générer un tableau groupé
+    function generateGroupedTable(data, groupBy, groupName, tbodyId) {
+        // Trier les données par groupe puis par version
+        const sortedData = [...data].sort((a, b) => {
+            if (a[groupBy] < b[groupBy]) return -1;
+            if (a[groupBy] > b[groupBy]) return 1;
+            return a.version.localeCompare(b.version);
+        });
+
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = "";
+
+        let currentGroup = null;
+        let groupRowSpan = 0;
+
+        sortedData.forEach((row, index) => {
+            const groupValue = row[groupBy];
+            if (groupValue !== currentGroup) {
+                // Nouveau groupe : ajouter une ligne avec cellule fusionnée
+                if (currentGroup !== null) {
+                    // Fermer le groupe précédent
+                    const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
+                    const firstRowOfGroup = tbody.lastElementChild;
+                    firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
+                }
+                // Commencer un nouveau groupe
+                currentGroup = groupValue;
+                const tr = document.createElement("tr");
+                const tdGroup = document.createElement("td");
+                tdGroup.textContent = groupValue;
+                tdGroup.style.fontWeight = "bold";
+                tr.appendChild(tdGroup);
+                tbody.appendChild(tr);
+            }
+
+            // Ajouter les autres cellules
+            const tr = tbody.lastElementChild;
+            const tdComposant = document.createElement("td");
+            tdComposant.textContent = groupBy === "application" ? row.composant : row.application;
+            tr.appendChild(tdComposant);
+
+            const tdVersion = document.createElement("td");
+            tdVersion.textContent = row.version;
+            tr.appendChild(tdVersion);
+
+            const tdEol = document.createElement("td");
+            tdEol.textContent = formatDate(row.eol_date);
+            tdEol.className = getEolClass(row.eol_date);
+            tr.appendChild(tdEol);
+
+            // Ajoutez ici les autres colonnes si nécessaire
+        });
+
+        // Fermer le dernier groupe
+        if (currentGroup !== null) {
+            const groupRows = sortedData.filter(r => r[groupBy] === currentGroup);
+            const firstRowOfGroup = tbody.lastElementChild;
+            firstRowOfGroup.firstElementChild.rowSpan = groupRows.length;
+        }
+    }
+
+    // Fonction pour générer le tableau EOL critique
+    function generateEolCriticalTable(data) {
+        const today = new Date();
+        const criticalThreshold = new Date();
+        criticalThreshold.setDate(today.getDate() + 120); // 4 mois
+
+        const criticalData = data.filter(row => {
+            if (!row.eol_date) return false;
+            const eolDate = new Date(row.eol_date);
+            return eolDate <= criticalThreshold;
+        });
+
+        const tbody = document.getElementById("tbody-eol-critical");
+        tbody.innerHTML = "";
+        criticalData.forEach(row => {
+            const tr = document.createElement("tr");
+
+            const tdApp = document.createElement("td");
+            tdApp.textContent = row.NOM_APPLICATION;
+            tr.appendChild(tdApp);
+
+            const tdComposant = document.createElement("td");
+            tdComposant.textContent = row.NOM_COMPOSANT;
+            tr.appendChild(tdComposant);
+
+            const tdCurrVersion = document.createElement("td");
+            tdCurrVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+            tr.appendChild(tdCurrVersion);
+
+            const tdCurrEol = document.createElement("td");
+            tdCurrEol.textContent = formatDate(row.RELEASE_EOL_DATE_AFFICHEE);
+            // tdCurrEol.className = getEolClass(row.eol_date);
+            tr.appendChild(tdCurrEol);
+
+            const tdDaysLeft = document.createElement("td");
+            tdDaysLeft.textContent = getDaysLeft(row.eol_date);
+            tr.appendChild(tdDaysLeft);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Fonction pour afficher un onglet
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // Initialiser les tableaux au chargement
+    document.addEventListener('DOMContentLoaded', () => {
+        generateGroupedTable(tableData, "application", "Application", "tbody-by-app");
+        generateGroupedTable(tableData, "composant", "Composant", "tbody-by-composant");
+        generateEolCriticalTable(tableData);
+    });
+</script>
+  </div>
+</body>
+</html>
