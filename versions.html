@@ -67,7 +67,7 @@
 <body>
   <div style="font-family: sans-serif; padding: 1em;">
     <h1>Tableau de bord des EOL RDR4</h1>
-	<h2>Version 0.6</h2>
+	<h2>Version 0.6.1</h2>
 	
 	
 	
@@ -136,7 +136,18 @@
 <script>
 
 	// Récupérer les données de la table via l'API Grist
-    const tableData = grist.docApi.fetchSelectedTable();	
+    //const tableData = grist.docApi.fetchSelectedTable();	
+	
+	// Réception automatique de l'ensemble des enregistrements de la table liée
+    grist.onRecords((tableData) => {
+      currentRecords = tableData;
+      if (status.innerText === "Initialisation...") {
+        console.log(`Prêt (${tableData.length} enregistrement(s) chargé(s)).`);
+      }
+    });
+	
+	// Indispensable pour autoriser l'écriture
+    grist.ready({ requiredAccess: 'full' });
 	
 
     // Fonction pour formater une date en DD/MM/YYYY
