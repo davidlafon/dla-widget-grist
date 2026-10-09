@@ -199,10 +199,10 @@
                 vertical-align: middle;
                 border-bottom: 2px solid #cbd5d9;
             }
-            tbody tr.status-critical {
+            tbody tr.status-critical, tbody tr td.status-critical {
                 border-left-color: var(--danger);
             }
-            tbody tr.status-warning {
+            tbody tr.status-warning, tbody tr td.status-warning {
                 border-left-color: var(--warn);
             }
             tbody tr.status-ok {
@@ -386,7 +386,8 @@
                 "use strict";
 				const VERSION = "0.7";
 				const dToday = new Date();
-				document.getElementById('versionDoc').innerText = "Version ${VERSION} - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+				document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+				
                 const $ = (id) => document.getElementById(id);
                 const text = (value) => (value === null || value === undefined || value === "" ? "—" : String(value));
                 const first = (row, names) => {
@@ -460,18 +461,19 @@
                         }
                     });
                     const status = statusFor(record.alert);
-                    tr.classList.add("status-" + status[0]);
+                    //tr.classList.add("status-" + status[0]);
                     const group = groupBy === "app" ? record.app : record.component;
                     if (groupSize > 0) {
                         const groupCell = cell(group, "group-cell");
                         if (groupSize > 1) groupCell.rowSpan = groupSize;
                         tr.append(groupCell);
                     }
-                    tr.append(cell(groupBy === "app" ? record.component : record.app));
-                    tr.append(cell(record.current));
-                    tr.append(cell(formatDate(record.eol)));
-                    tr.append(cell(record.target));
-                    tr.append(cell(formatDate(record.targetEol)));
+					
+                    tr.append(cell(groupBy === "app" ? record.component : record.app), "status-" + status[0]);
+                    tr.append(cell(record.current), "status-" + status[0]);
+                    tr.append(cell(formatDate(record.eol)), "status-" + status[0]);
+                    tr.append(cell(record.target), "status-" + status[0]);
+                    tr.append(cell(formatDate(record.targetEol)), "status-" + status[0]);
                     const badge = document.createElement("td");
                     const span = document.createElement("span");
                     span.className = "status " + status[0];
@@ -511,7 +513,7 @@
                             '<tr><td colspan="7" class="empty">Aucun enregistrement à afficher.</td></tr>';
                 }
                 function renderCritical(list) {
-                    const critical = list.filter((r) => alertLevel(r.alert) === 5);
+                    const critical = list.filter((r) => alertLevel(r.alert) === 1);
                     const tbody = $("tbody-critical");
                     tbody.replaceChildren();
                     critical.forEach((r) => {
