@@ -95,7 +95,7 @@
 </div>
 
 <script>
-const VERSION = "0.9.3";
+const VERSION = "0.9.4";
 const dToday = new Date();
 document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 	// Récupérer les données de la table 
@@ -293,7 +293,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             const tr = tbody.lastElementChild;
 
             const tdComposant = document.createElement("td");
-            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
+            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT+"("+row.ALERTE+")" : row.NOM_APPLICATION+"("+row.ALERTE+")";
 			tdComposant.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdComposant);
 
