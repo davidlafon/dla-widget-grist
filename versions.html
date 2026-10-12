@@ -317,6 +317,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
             const tdEolCible = document.createElement("td");
             tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
+			tdEolCible.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdEolCible);
         });
 

@@ -96,125 +96,126 @@
   
   
  /* Styles pour les tableaux */
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-family: Arial, sans-serif;
-    }
-    .custom-table th, .custom-table td {
-        border: 1px solid #ddd;
-        padding: 8px 12px;
-        text-align: left;
-		font-size: 0.8em;
-    }
-    .custom-table th {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .custom-table tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-    .custom-table tr:hover {
-        background-color: #e6e6e6;
-    }
+.custom-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 20px 0;
+	font-family: Arial, sans-serif;
+}
+.custom-table th, .custom-table td {
+	border: 1px solid #ddd;
+	padding: 8px 12px;
+	text-align: left;
+	font-size: 0.8em;
+}
+.custom-table th {
+	background-color: #4CAF50;
+	color: white;
+}
+.custom-table tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+.custom-table tr:hover {
+	background-color: #e6e6e6;
+}
 
-    /* Styles pour les boutons */
-    .button-group {
-        margin: 20px 0;
-    }
-    .button-group button {
-        padding: 10px 20px;
-        margin-right: 10px;
-        background-color: var(--ink);
-        color: var(--panel);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .button-group button:hover {
-        background-color: var(--muted);
-    }
-	
-	.button-group button.crit {
-        background-color: var(--danger);
-        color: var(--panel);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .button-group button.crit:hover {
-        background-color: var(--danger-soft);
-        color: var(--danger);
-    }
+/* Styles pour les boutons */
+.button-group {
+	margin: 20px 0;
+}
+.button-group button {
+	padding: 10px 20px;
+	margin-right: 10px;
+	background-color: var(--ink);
+	color: var(--panel);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.button-group button:hover {
+	background-color: var(--muted);
+}
 
-    /* Styles pour les onglets */
-    .tab-content {
-        display: none;
-    }
-    .tab-content.active {
-        display: block;
-    }
+.button-group button.crit {
+	background-color: var(--danger);
+	color: var(--panel);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.button-group button.crit:hover {
+	background-color: var(--danger-soft);
+	color: var(--danger);
+}
 
-    /* Style pour les dates EOL critiques */
-    .eol-critical {
-        color: var(--danger);
-        font-weight: bold;
-    }
-    .eol-warning {
-        color: var(--warn);
-        font-weight: bold;
-    }
-    .eol-ok {
-        color: green;
-    }
+/* Styles pour les onglets */
+.tab-content {
+	display: none;
+}
+.tab-content.active {
+	display: block;
+}
+
+/* Style pour les dates EOL critiques */
+.eol-critical {
+	color: var(--danger);
+	background-color: var(--danger-soft);
+	font-weight: bold;
+}
+.eol-warning {
+	color: var(--warn);
+	font-weight: bold;
+}
+.eol-ok {
+	color: green;
+}
 
 
-    /* Filtres multi-sélection */
-    .filter-bar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 12px;
-        margin: 20px 0;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #fafafa;
-        font-family: Arial, sans-serif;
-    }
-    .filter-control {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        min-width: 220px;
-    }
-    .filter-control label {
-        font-weight: bold;
-        color: #333;
-    }
-    .filter-control select {
-        min-height: 72px;
-        padding: 4px;
-        border: 1px solid #bbb;
-        border-radius: 4px;
-        background: white;
-		color: var(--ink);
-		font-size: 0.9em;
-    }
-    .filter-count {
-        color: #666;
-        font-size: 0.9em;
-        font-weight: normal;
-    }
-    .filter-bar .clear-filters {
-        padding: 8px 14px;
-        background-color: var(--ink);
-        color: var(--panel);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .filter-bar .clear-filters:hover {
-        background-color: #45a049;
-    }
+/* Filtres multi-sélection */
+.filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 12px;
+	margin: 20px 0;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background-color: #fafafa;
+	font-family: Arial, sans-serif;
+}
+.filter-control {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 220px;
+}
+.filter-control label {
+	font-weight: bold;
+	color: #333;
+}
+.filter-control select {
+	min-height: 72px;
+	padding: 4px;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	background: white;
+	color: var(--ink);
+	font-size: 0.9em;
+}
+.filter-count {
+	color: #666;
+	font-size: 0.9em;
+	font-weight: normal;
+}
+.filter-bar .clear-filters {
+	padding: 8px 14px;
+	background-color: var(--ink);
+	color: var(--panel);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.filter-bar .clear-filters:hover {
+	background-color: #45a049;
+}
