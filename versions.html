@@ -95,7 +95,7 @@
 </div>
 
 <script>
-const VERSION = "0.9.4";
+const VERSION = "0.9.5";
 const dToday = new Date();
 document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
 	// Récupérer les données de la table 
@@ -219,11 +219,12 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
     // Fonction pour déterminer la classe CSS en fonction de l'alerte
     function getEolAlertClass(alertLvl) {
+	
       switch(alertLvl) {
-        case 1 :
+        case "1" :
           return "eol-critical";
 		  break;
-        case 2 :
+        case "2" :
           return "eol-warning";
 		  break;
         default:
