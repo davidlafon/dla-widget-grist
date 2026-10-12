@@ -2,211 +2,7 @@
 <head>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
-  :root {
-                --ink: #17212b;
-                --muted: #66727d;
-                --line: #dfe5e9;
-                --panel: #fff;
-                --wash: #f5f7f8;
-                --accent: #0f766e;
-                --accent-soft: #dff4ef;
-                --danger: #b42318;
-                --danger-soft: #fde8e7;
-                --warn: #a15c00;
-                --warn-soft: #fff1d6;
-                --shadow: 0 8px 24px rgba(23, 33, 43, 0.08);
-            }
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                background: linear-gradient(135deg, #f7faf9 0%, #eef3f4 100%);
-                color: var(--ink);
-                font-family:
-                    ui-sans-serif,
-                    system-ui,
-                    -apple-system,
-                    "Segoe UI",
-                    sans-serif;
-                font-size: 13px;
-            }
-            .shell {
-                padding: 18px;
-                max-width: 1500px;
-                margin: 0 auto;
-            }
-            .hero {
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-between;
-                gap: 16px;
-                margin-bottom: 16px;
-            }
-            .eyebrow {
-                margin: 0 0 5px;
-                text-transform: uppercase;
-                letter-spacing: 0.13em;
-                font-size: 10px;
-                font-weight: 800;
-                color: var(--accent);
-            }
-            h1 {
-                margin: 0;
-                font-size: clamp(20px, 3vw, 30px);
-                letter-spacing: -0.03em;
-                line-height: 1.1;
-            }
-            .subtitle {
-                margin: 7px 0 0;
-                color: var(--muted);
-            }
-            .version {
-                white-space: nowrap;
-                color: var(--muted);
-                border: 1px solid var(--line);
-                background: rgba(255, 255, 255, 0.65);
-                border-radius: 999px;
-                padding: 7px 10px;
-                font-size: 11px;
-            }
-            .summary {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 10px;
-                margin-bottom: 16px;
-            }
-            .metric {
-                background: var(--panel);
-                border: 1px solid var(--line);
-                border-radius: 12px;
-                padding: 5px;
-                box-shadow: var(--shadow);
-				text-align: center;
-            }
-            .metric-label {
-                color: var(--muted);
-                font-size: 11px;
-            }
-            .metric-value {
-                display: block;
-                font-size: 23px;
-                font-weight: 800;
-                letter-spacing: -0.04em;
-            }
-            .metric-value.alert {
-                color: var(--danger);
-            }
   
-  
- /* Styles pour les tableaux */
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-family: Arial, sans-serif;
-    }
-    .custom-table th, .custom-table td {
-        border: 1px solid #ddd;
-        padding: 8px 12px;
-        text-align: left;
-    }
-    .custom-table th {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .custom-table tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-    .custom-table tr:hover {
-        background-color: #e6e6e6;
-    }
-
-    /* Styles pour les boutons */
-    .button-group {
-        margin: 20px 0;
-    }
-    .button-group button {
-        padding: 10px 20px;
-        margin-right: 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .button-group button:hover {
-        background-color: #45a049;
-    }
-
-    /* Styles pour les onglets */
-    .tab-content {
-        display: none;
-    }
-    .tab-content.active {
-        display: block;
-    }
-
-    /* Style pour les dates EOL critiques */
-    .eol-critical {
-        color: red;
-        font-weight: bold;
-    }
-    .eol-warning {
-        color: orange;
-        font-weight: bold;
-    }
-    .eol-ok {
-        color: green;
-    }
-
-
-    /* Filtres multi-sélection */
-    .filter-bar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 12px;
-        margin: 20px 0;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #fafafa;
-        font-family: Arial, sans-serif;
-    }
-    .filter-control {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        min-width: 220px;
-    }
-    .filter-control label {
-        font-weight: bold;
-        color: #333;
-    }
-    .filter-control select {
-        min-height: 72px;
-        padding: 4px;
-        border: 1px solid #bbb;
-        border-radius: 4px;
-        background: white;
-    }
-    .filter-count {
-        color: #666;
-        font-size: 0.9em;
-        font-weight: normal;
-    }
-    .filter-bar .clear-filters {
-        padding: 8px 14px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .filter-bar .clear-filters:hover {
-        background-color: #45a049;
-    }
   </style>
 </head>
 <body>
@@ -242,7 +38,7 @@
 <div class="button-group">
     <button onclick="showTab('by-app')">Par Application</button>
     <button onclick="showTab('by-composant')">Par Composant</button>
-    <button onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
+    <button class="crit" onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
 </div>
 
 <!-- Tableau groupé par application -->
@@ -478,7 +274,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
                 groupRowCount = 0;
 
                 const tr = document.createElement("tr");
-                tr.className = getEolAlertClass(row.ALERTE);
+                //tr.className = getEolAlertClass(row.ALERTE);
 
                 const tdGroup = document.createElement("td");
                 tdGroup.textContent = groupValue === null || groupValue === undefined ? "(vide)" : String(groupValue);
@@ -489,7 +285,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
                 firstRowOfCurrentGroup = tr;
             } else {
                 const tr = document.createElement("tr");
-                tr.className = getEolAlertClass(row.ALERTE);
+                //tr.className = getEolAlertClass(row.ALERTE);
                 tbody.appendChild(tr);
             }
 
@@ -500,18 +296,22 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
             const tdComposant = document.createElement("td");
             tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
+			tdComposant.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdComposant);
 
             const tdVersion = document.createElement("td");
             tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+			tdVersion.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdVersion);
 
             const tdEol = document.createElement("td");
             tdEol.textContent = row.RELEASE_EOL_DATE_AFFICHEE;
+			tdEol.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdEol);
 
             const tdVersionCible = document.createElement("td");
             tdVersionCible.textContent = row.RELEASE_CIBLE;
+			tdVersionCible.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdVersionCible);
 
             const tdEolCible = document.createElement("td");
