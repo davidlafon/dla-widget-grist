@@ -335,7 +335,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
         tbody.innerHTML = "";
         criticalData.forEach(row => {
             const tr = document.createElement("tr");
-            tr.className = getEolAlertClass(row.ALERTE);
+            tr.className = getEolAlertClass(row.ALERTE)+"-crit";
 
             const addCell = (text) => {
                 const td = document.createElement("td");
