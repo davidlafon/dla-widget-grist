@@ -34,12 +34,16 @@
 
     <!-- Boutons pour basculer entre les vues -->
 <div class="button-group">
-    <button onclick="showTab('by-app')">Par Application</button>
-    <button onclick="showTab('by-composant')">Par Composant</button>
-    <button class="crit" onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
-	<div class="eol-critical">EOL dépassée</div>
-	<div class="eol-warn">EOL < 4 mois </div>
-	<span class="help">eOL : End Of Life</span>
+	<div class="buttons">
+		<button onclick="showTab('by-app')">Par Application</button>
+		<button onclick="showTab('by-composant')">Par Composant</button>
+		<button class="crit" onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
+	</div>
+	<div class="legende">Légende
+		<div title="Situation critique : réaction urgente dans le prochain TDV/Période" class="eol-critical">EOL dépassée</div>
+		<div title="Situation à anticiper : à traiter dans les prochains TDV/Périodes" class="eol-warning">EOL &lt; 4 mois </div>
+		<div class="help">EOL : End Of Life</div>
+	</div>
 </div>
 
 <!-- Tableau groupé par application -->
