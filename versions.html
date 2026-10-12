@@ -221,11 +221,13 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     function getEolAlertClass(alertLvl) {
       switch(alertLvl) {
         case 1 :
-          return "eol-critical"
+          return "eol-critical";
+		  break;
         case 2 :
-          return "eol-warning"
+          return "eol-warning";
+		  break;
         default:
-          return"eol-ok"
+          return"eol-ok";
       }
     }
 
@@ -293,7 +295,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             const tr = tbody.lastElementChild;
 
             const tdComposant = document.createElement("td");
-            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT+"("+row.ALERTE+")" : row.NOM_APPLICATION+"("+row.ALERTE+")";
+            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
 			tdComposant.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdComposant);
 
