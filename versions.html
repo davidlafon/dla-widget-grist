@@ -10,7 +10,7 @@
 			<p class="eyebrow">Grist · pilotage des versions</p>
 			<h1>Tableau de bord des EOL RDR4</h1>
 			<p class="subtitle">
-				Une vue opérationnelle des composants à maintenir et des échéances à anticiper.
+				Une vue opérationnelle des composants logiciels à maintenir et des échéances à anticiper.
 			</p>
 		</div>
 		<span id="versionDoc" class="version"></span>
@@ -37,6 +37,9 @@
     <button onclick="showTab('by-app')">Par Application</button>
     <button onclick="showTab('by-composant')">Par Composant</button>
     <button class="crit" onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
+	<div class="eol-critical">EOL dépassée</div>
+	<div class="eol-warn">EOL < 4 mois </div>
+	<span class="help">eOL : End Of Life</span>
 </div>
 
 <!-- Tableau groupé par application -->

@@ -11,8 +11,8 @@
 	--warn: #d64d00;
 	--warn-soft: #fff4f3;
 	--shadow: 0 8px 24px rgba(23, 33, 43, 0.08);
-	--button: #000091;
-	--button-hover: #1212ff;
+	--blue-france: #000091;
+	--blue-france-hover: #1212ff;
 	--tab-header: #f6f6f6;
 	--tab-header-font: #3a3a3a;
 }
@@ -49,7 +49,7 @@ body {
 	letter-spacing: 0.13em;
 	font-size: 10px;
 	font-weight: 800;
-	color: var(--accent);
+	color: var(--blue-france);
 }
 h1 {
 	margin: 0;
@@ -130,14 +130,24 @@ h1 {
 .button-group button {
 	padding: 10px 20px;
 	margin-right: 10px;
-	background-color: var(--button);
+	background-color: var(--blue-france);
 	color: var(--panel);
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
 }
 .button-group button:hover {
-	background-color: var(--button-hover);
+	background-color: var(--blue-france-hover);
+}
+
+.button-group div {
+	padding: 10px 20px;
+	margin-right: 10px;
+	border: none;
+	border-radius: 4px;
+}
+.button-group div.help {
+	font-style: italic;
 }
 
 .button-group button.crit {
@@ -227,12 +237,12 @@ h1 {
 }
 .filter-bar .clear-filters {
 	padding: 8px 14px;
-	background-color: var(--button);
+	background-color: var(--blue-france);
 	color: var(--panel);
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
 }
 .filter-bar .clear-filters:hover {
-	background-color: var(--button-hover);
+	background-color: var(--blue-france-hover);
 }
