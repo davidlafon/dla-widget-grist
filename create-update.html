@@ -57,9 +57,7 @@ async function getOpenSourceComposants() {
   const result = [];
   const n = records.id.length;
   for (let i = 0; i < n; i++) {
-    //if (records.LICENCE[i] === 'Open-source') {
-      result.push(records.ID_COMPOSANT[i]);
-    //}
+	result.push(records.ID_COMPOSANT[i]);
   }
   return result;
 }
@@ -94,7 +92,7 @@ function dateToTimestamp(dateStr) {
 btnInit.addEventListener('click', async () => {
   setBusy(true);
   clearLog();
-  log('Récupération des composants Open-source...', 'info');
+  log('Récupération des composants...', 'info');
 
   try {
     const composants = await getOpenSourceComposants();
