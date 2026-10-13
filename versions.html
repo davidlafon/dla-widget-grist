@@ -72,6 +72,7 @@
             <tr>
                 <th>Application</th>
                 <th>Composant</th>
+                <th>Niveau d'alerte</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
                 <th>Version cible</th>
@@ -90,6 +91,7 @@
             <tr>
                 <th>Application</th>
                 <th>Composant</th>
+                <th>Niveau d'alerte</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
                 <th>Version cible</th>
@@ -203,8 +205,6 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     if (grist.onRecords) {
         grist.onRecords(records => setRecords(records));
     }
-	
-
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
@@ -226,7 +226,6 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
     // Fonction pour déterminer la classe CSS en fonction de l'alerte
     function getEolAlertClass(alertLvl) {
-	
       switch(alertLvl) {
         case "1" :
           return "eol-critical";
@@ -236,6 +235,20 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 		  break;
         default:
           return"eol-ok";
+      }
+    }
+	
+    // Fonction pour retourner le picto en fonction de l'alerte
+    function getEolAlertPicto(alertLvl) {
+      switch(alertLvl) {
+        case "1" :
+          return "🚨";
+		  break;
+        case "2" :
+          return "⚠️";
+		  break;
+        default:
+          return "✅";
       }
     }
 
@@ -306,6 +319,11 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
 			tdComposant.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdComposant);
+
+            const tdPicto = document.createElement("td");
+            tdPicto.textContent = getEolAlertPicto(row.ALERTE);
+			tdPicto.className = getEolAlertClass(row.ALERTE);
+            tr.appendChild(tdPicto);
 
             const tdVersion = document.createElement("td");
             tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
