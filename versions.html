@@ -325,7 +325,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
             const tdVersion = document.createElement("td");
 			if (row.ALERTE == "5" && row.LTS) {
-				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + " <span class=""lts"">(LTS)</span>";	
+				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + ' <span class="lts">(LTS)</span>';	
 			}
 			else {
 			    tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
