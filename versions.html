@@ -310,7 +310,6 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             }
 
             groupRowCount++;
-console.log(row);
             // On complète la ligne courante (la dernière ajoutée au tbody)
             const tr = tbody.lastElementChild;
 
@@ -326,7 +325,7 @@ console.log(row);
 
             const tdVersion = document.createElement("td");
 			//console.log("%s - %s : %s, %s (%s)",row.NOM_COMPOSANT, row.CURRENT_VERSION_COMPOSANT, row.ALERTE, row.LTS, typeof(row.LTS))
-			if (row.ALERTE==5 && row.LTS) {
+			if (row.ALERTE=="5" && row.LTS) {
 				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + " (LTS)";	
 			}
 			else {
