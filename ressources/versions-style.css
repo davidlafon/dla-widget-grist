@@ -189,6 +189,12 @@ h1 {
 	display: block;
 }
 
+.lts{
+	font-variant-caps: small-caps;
+    font-size: 0.8em;
+    color: #27a658;
+}
+
 /* Style pour les dates EOL critiques */
 .eol-critical {
 	color: var(--danger);
