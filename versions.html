@@ -315,7 +315,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
             const tdPicto = document.createElement("td");
             tdPicto.textContent = getEolAlertPicto(row.ALERTE);
-			tdPicto.className = getEolAlertClass(row.ALERTE)+" cent";
+			tdPicto.className = getEolAlertClass(row.ALERTE)+"-pic";
             tr.appendChild(tdPicto);
 
             const tdComposant = document.createElement("td");

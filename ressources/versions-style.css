@@ -113,8 +113,8 @@ h1 {
 	font-size: 0.8em;
 }
 .custom-table th {
-	background-color: var(--ink);
-    color: var(--wash);
+	background-color: var(--tab-header);
+    color: var(--tab-header-font);
 }
 
 .custom-table th.picto {
@@ -211,9 +211,25 @@ h1 {
 	/*color: green;*/
 }
 
-.cent {
+
+.eol-critical-pic {
+	color: var(--danger);
+	background-color: var(--danger-soft);
+	font-weight: bold;
+    font-size: 1.5em !important;
 	text-align: center !important;
 }
+.eol-warning-pic {
+	color: var(--warn);
+	background-color: var(--warn-soft);
+	font-weight: bold;
+    font-size: 1.2em !important;
+	text-align: center !important;
+}
+.eol-ok-pic {
+	text-align: center !important;
+}
+
 /* Style pour les dates EOL critiques dans le tableau critique */
 .eol-critical-crit {
 	color: var(--danger);
