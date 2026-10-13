@@ -52,7 +52,7 @@
         <thead>
             <tr>
                 <th>Application</th>
-                <th>Niveau d'alerte</th>
+                <th class="picto">Niveau d'alerte</th>
                 <th>Composant</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
@@ -71,7 +71,7 @@
         <thead>
             <tr>
                 <th>Application</th>
-                <th>Niveau d'alerte</th>
+                <th class="picto">Niveau d'alerte</th>
                 <th>Composant</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
@@ -233,7 +233,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
           return "eol-warning";
 		  break;
         default:
-          return"eol-ok";
+          return "eol-ok";
       }
     }
 	
@@ -316,7 +316,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
 
             const tdPicto = document.createElement("td");
             tdPicto.textContent = getEolAlertPicto(row.ALERTE);
-			tdPicto.className = getEolAlertClass(row.ALERTE+" cent");
+			tdPicto.className = getEolAlertClass(row.ALERTE)+" cent";
             tr.appendChild(tdPicto);
 
             const tdComposant = document.createElement("td");
