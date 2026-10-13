@@ -56,7 +56,7 @@
                 <th>Composant</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
-                <th>Version cible</th>
+                <th>Version cible (<abbr title="Long Time Support">LTS</abbr>)</th>
                 <th>Date EOL cible</th>
             </tr>
         </thead>
@@ -325,6 +325,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             tr.appendChild(tdComposant);
 
             const tdVersion = document.createElement("td");
+			console.log("%s - %s : %s, %s (%s)",row.NOM_COMPOSANT, row.CURRENT_VERSION_COMPOSANT, row.ALERTE, row.LTS, typeof(row.LTS))
 			if (row.ALERTE==5 && row.LTS) {
 				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + " (LTS)";	
 			}
