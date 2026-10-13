@@ -15,7 +15,7 @@
   </style>
 </head>
 <body>
-<h1>Ajout d'uns composant logiciel</h1>
+<h1>Création/ajout d'un composant logiciel</h1>
 <h2 class="error">À utiliser avec précaution</h2>
 <h3>Version 1.0</h3>
 
@@ -40,6 +40,9 @@
     const btn = document.getElementById('btn');
     const input = document.getElementById('prod');
     const status = document.getElementById('status');
+	
+	// Indispensable pour autoriser l'écriture
+    grist.ready({ requiredAccess: 'full' });
 
     // Cache local des lignes envoyé automatiquement par Grist
     let currentRecords = [];
@@ -52,9 +55,6 @@
       }
     });
 
-    // Indispensable pour autoriser l'écriture
-    grist.ready({ requiredAccess: 'full' });
-
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') btn.click();
     });
@@ -63,7 +63,7 @@
       const product = input.value.trim().toLowerCase();
       if (!product) {
         status.className = 'error';
-        status.innerText = "Veuillez saisir un nom de composant.";
+        status.innerText = "Veuillez saisir un nom de composant";
         return;
       }
 
