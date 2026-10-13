@@ -16,38 +16,20 @@
 </head>
 <body>
 <h1>Création / Mise à jour des composants logiciels</h1>
-<h2>Version 1.9</h2>
-<div id="widget-ui" hidden>
-	<div class="row">
-	  <button id="btnInit">Initialiser</button>
-	  <button id="btnUpdate">Mettre à jour</button>
-	</div>
-	<div id="status">Prêt</div>
+<h2 class="error">À utiliser avec précaution</h2>
+<h3>Version 1.9</h3>
+
+<div class="row">
+  <button id="btnInit">Initialiser</button>
+  <button id="btnUpdate">Mettre à jour</button>
 </div>
+<div id="status">Prêt</div>
+
 
 <script>
-// ---- vérification des droits
-const ui = document.getElementById("widget-ui");
-const message = document.getElementById("message");
-
 grist.ready({
-requiredAccess: "full"
+	requiredAccess: "full"
 });
-
-grist.onOptions((options, interaction) => {
-	const accessLevel = interaction?.accessLevel;
-	const autoriserInterface = accessLevel === "full";
-
-	ui.hidden = !autoriserInterface;
-	message.hidden = autoriserInterface;
-
-	if (!autoriserInterface) {
-	  message.textContent =
-		"Ce widget nécessite le niveau d’accès complet.";
-	}
-});
-
-
 
 const statusEl = document.getElementById('status');
 const btnInit = document.getElementById('btnInit');
