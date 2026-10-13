@@ -35,13 +35,16 @@ requiredAccess: "full"
 });
 
 grist.onOptions((options, interaction) => {
-const peutUtiliser = interaction?.access_level === "full";
+	const accessLevel = interaction?.accessLevel;
+	const autoriserInterface = accessLevel === "full";
 
-ui.hidden = !peutUtiliser;
-message.hidden = peutUtiliser;
-message.textContent = peutUtiliser
-  ? ""
-  : "Ce widget nécessite un accès complet au document.";
+	ui.hidden = !autoriserInterface;
+	message.hidden = autoriserInterface;
+
+	if (!autoriserInterface) {
+	  message.textContent =
+		"Ce widget nécessite le niveau d’accès complet.";
+	}
 });
 
 
