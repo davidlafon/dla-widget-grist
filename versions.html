@@ -204,6 +204,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     if (grist.onRecords) {
         grist.onRecords(records => setRecords(records));
     }
+	console.log(records);
 
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
@@ -378,7 +379,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             addCell(row.NOM_COMPOSANT);
             addCell(row.CURRENT_VERSION_COMPOSANT);
             addCell(formatDate(row.RELEASE_EOL_DATE_AFFICHEE));
-            addCell(row.$RELEASE_CIBLE);
+            addCell(row.RELEASE_CIBLE);
             addCell(formatDate(row.RELEASE_CIBLE_DATE));
             addCell(Number(row.ALERTE) === 1 ? "Dépassée" : "< 4 mois");
 
