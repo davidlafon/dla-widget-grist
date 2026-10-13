@@ -133,7 +133,8 @@ btnInit.addEventListener('click', async () => {
             RELEASE_EOES_DATE: dateToTimestamp(rel.eoesFrom),
             LATEST_RELEASE_NAME: latest.name || '',
             LATEST_RELEASE_DATE: dateToTimestamp(latest.date),
-            LATEST_RELEASE_LIEN: latest.link || ''
+            LATEST_RELEASE_LIEN: latest.link || '',
+            LTS: rel.isLts || 'false'
           }]);
 
           existingIds.add(idRelease);
@@ -201,7 +202,8 @@ btnUpdate.addEventListener('click', async () => {
             RELEASE_EOES_DATE: dateToTimestamp(result.eoesFrom),
             LATEST_RELEASE_NAME: latest.name || '',
             LATEST_RELEASE_DATE: dateToTimestamp(latest.date),
-            LATEST_RELEASE_LIEN: latest.link || ''
+            LATEST_RELEASE_LIEN: latest.link || '',
+            LTS: result.isLts || 'false'
           }
         ]);
 
