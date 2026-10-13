@@ -204,8 +204,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
     if (grist.onRecords) {
         grist.onRecords(records => setRecords(records));
     }
-	console.log(records);
-
+	
     // Fonction pour formater une date en DD/MM/YYYY
     function formatDate(dateStr) {
         if (!dateStr) return "N/A";
@@ -311,7 +310,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             }
 
             groupRowCount++;
-
+console.log(row);
             // On complète la ligne courante (la dernière ajoutée au tbody)
             const tr = tbody.lastElementChild;
 
