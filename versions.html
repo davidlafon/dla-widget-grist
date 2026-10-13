@@ -324,7 +324,7 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             tr.appendChild(tdComposant);
 
             const tdVersion = document.createElement("td");
-			console.log("%s - %s : %s (%s), %s (%s)",row.NOM_COMPOSANT, row.CURRENT_VERSION_COMPOSANT, row.ALERTE, typeof(row.ALERTE), row.LTS, typeof(row.LTS))
+			console.log("row.ALERTE=='5' && row.LTS : %s",row.ALERTE=="5" && row.LTS)
 			if (row.ALERTE=="5" && row.LTS) {
 				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + " (LTS)";	
 			}
