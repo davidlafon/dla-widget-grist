@@ -324,16 +324,13 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             tr.appendChild(tdComposant);
 
             const tdVersion = document.createElement("td");
-			console.log("row.CURRENT_VERSION_COMPOSANT + ' (LTS)' : %s",row.CURRENT_VERSION_COMPOSANT + " (LTS)");
 			if (row.ALERTE == "5" && row.LTS) {
-				console.log("IF true");
 				tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT + " (LTS)";	
 			}
 			else {
-				console.log("IF false");
 			    tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
 			}
-            tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+            //tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
 			tdVersion.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdVersion);
 
