@@ -206,7 +206,7 @@ h1 {
 }
 
 .cent {
-	text-align: center;
+	text-align: center !important;
 }
 /* Style pour les dates EOL critiques dans le tableau critique */
 .eol-critical-crit {
