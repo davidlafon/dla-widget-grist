@@ -116,6 +116,12 @@ h1 {
 	background-color: var(--ink);
     color: var(--wash);
 }
+
+.custom-table th.picto {
+	width: 5%;
+    min-width: 70px;
+}	
+
 .custom-table tr:nth-child(even) {
 	background-color: #f2f2f2;
 }
@@ -197,6 +203,10 @@ h1 {
 }
 .eol-ok {
 	/*color: green;*/
+}
+
+.cent {
+	text-align: center;
 }
 /* Style pour les dates EOL critiques dans le tableau critique */
 .eol-critical-crit {

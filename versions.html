@@ -40,9 +40,8 @@
 		<button class="crit" onclick="showTab('eol-critical')">EOL Critique (&lt;4 mois)</button>
 	</div>
 	<div class="legende">Légende
-		<div title="Situation critique : réaction urgente dans le prochain TDV/Période" class="eol-critical">EOL dépassée</div>
-		<div title="Situation à anticiper : à traiter dans les prochains TDV/Périodes" class="eol-warning">EOL &lt; 4 mois </div>
-		<div class="help">EOL : End Of Life</div>
+		<div title="Situation critique : réaction urgente dans le prochain TDV/Période" class="eol-critical">🚨 EOL dépassée</div>
+		<div title="Situation à anticiper : à traiter dans les prochains TDV/Périodes" class="eol-warning">⚠️EOL &lt; 4 mois </div>
 	</div>
 </div>
 
@@ -53,6 +52,7 @@
         <thead>
             <tr>
                 <th>Application</th>
+                <th>Niveau d'alerte</th>
                 <th>Composant</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
@@ -71,8 +71,8 @@
         <thead>
             <tr>
                 <th>Application</th>
-                <th>Composant</th>
                 <th>Niveau d'alerte</th>
+                <th>Composant</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
                 <th>Version cible</th>
@@ -91,7 +91,6 @@
             <tr>
                 <th>Application</th>
                 <th>Composant</th>
-                <th>Niveau d'alerte</th>
                 <th>Version actuelle</th>
                 <th>Date EOL</th>
                 <th>Version cible</th>
@@ -315,15 +314,15 @@ document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dTod
             // On complète la ligne courante (la dernière ajoutée au tbody)
             const tr = tbody.lastElementChild;
 
+            const tdPicto = document.createElement("td");
+            tdPicto.textContent = getEolAlertPicto(row.ALERTE);
+			tdPicto.className = getEolAlertClass(row.ALERTE+" cent");
+            tr.appendChild(tdPicto);
+
             const tdComposant = document.createElement("td");
             tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
 			tdComposant.className = getEolAlertClass(row.ALERTE);
             tr.appendChild(tdComposant);
-
-            const tdPicto = document.createElement("td");
-            tdPicto.textContent = getEolAlertPicto(row.ALERTE);
-			tdPicto.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdPicto);
 
             const tdVersion = document.createElement("td");
             tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
