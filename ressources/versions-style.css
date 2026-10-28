@@ -255,12 +255,13 @@ h1 {
 	border-radius: 4px;
 	background-color: #fafafa;
 	font-family: Arial, sans-serif;
+	max-width: 515px;
 }
 .filter-control {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-	min-width: 220px;
+	min-width: 170px;
 }
 .filter-control label {
 	font-weight: bold;
@@ -290,4 +291,13 @@ h1 {
 }
 .filter-bar .clear-filters:hover {
 	background-color: var(--blue-france-hover);
+}
+
+.filter-side {
+	display: flex;
+  flex-direction: column;
+}
+
+.filter-side .filter-count {
+	margin-top: 10px;
 }
