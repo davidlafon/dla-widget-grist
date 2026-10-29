@@ -156,7 +156,6 @@ function renderObsolescenceScores(applications) {
 				
         dRow.appendChild(dApp);
         dRow.appendChild(dScore);
-				dObs.appendChild(dRow);
 				
 				if (i <= Math.floor(nbApps / 2)) {
 					dCol1.appendChild(dRow);
@@ -165,6 +164,9 @@ function renderObsolescenceScores(applications) {
 					dCol2.appendChild(dRow);
 				}
     });
+		dObs.appendChild(dCol1);
+		dObs.appendChild(dCol2);
+		
 }
 
 // Données et état des filtres. Les noms de champs correspondent aux colonnes Grist.
