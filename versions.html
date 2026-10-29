@@ -129,6 +129,7 @@ Promise.all([tableData, applicationsData]).then(([relations, applications]) => {
 
 // Fonction pour afficher les scores d'obsolescence
 function renderObsolescenceScores(applications) {
+console.log("renderObsolescenceScores");
     const dObs = document.getElementById("obsolescence");
     dObs.innerHTML = "";
 
@@ -139,18 +140,20 @@ function renderObsolescenceScores(applications) {
 	</div>
 </div>*/
     applications.forEach(app => {
-        const row = document.createElement("div");
-				row.className = "obsRow";
+				console.log("app : %s | Score : %s", , app.ScoreObs); 
+        const dRow = document.createElement("div");
+				dRow.className = "obsRow";
 				
         const dApp = document.createElement("div");
 				dApp.className = "ObsApp";
 				dApp.textContent = app.INTITULE;
-        row.appendChild(dApp);
 				
         const dScore = document.createElement("div");
         dScore.className = "obsolescence-ban "+app.ScoreObs;
 				dScore.innerHTML = '<p class="banner__text"></p>';
+				
         dApp.appendChild(dScore);
+        dRow.appendChild(dApp);
     });
 }
 
