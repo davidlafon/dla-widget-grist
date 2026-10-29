@@ -33,6 +33,9 @@
 			<span class="filter-count" id="filtered-row-count" aria-live="polite">0 ligne affichée</span>
 		</div>
 </div>
+<div class="obsolescence-tab" id="obsolescence">
+
+</div>
 
     <!-- Boutons pour basculer entre les vues -->
 <div class="button-group">
@@ -108,318 +111,357 @@
 const VERSION = "1.0";
 const dToday = new Date();
 document.getElementById('versionDoc').innerText = "Version "+VERSION+" - "+ dToday.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
-	// Récupérer les données de la table 
-    grist.ready({ requiredAccess: "read table" });
-    const tableData = grist.fetchSelectedTable()	
-
-    // Données et état des filtres. Les noms de champs correspondent aux colonnes Grist.
-    let currentRecords = [];
-    const APPLICATION_FIELD = "NOM_APPLICATION";
-    const COMPONENT_FIELD = "NOM_COMPOSANT";
-    const selectedApplications = new Set();
-    const selectedComponents = new Set();
-
-    function displayValue(value) {
-        return value === null || value === undefined || value === "" ? "(vide)" : String(value);
-    }
-
-    function valuesFor(records, field) {
-        return [...new Set(records.map(row => displayValue(row[field])))].sort((a, b) => a.localeCompare(b, "fr"));
-    }
-
-    function selectedValues(select) {
-        return new Set([...select.selectedOptions].map(option => option.value));
-    }
-
-    function refreshFilterOptions(records) {
-        const configs = [
-            ["application-filter", APPLICATION_FIELD, selectedApplications],
-            ["component-filter", COMPONENT_FIELD, selectedComponents]
-        ];
-        configs.forEach(([id, field, selected]) => {
-            const select = document.getElementById(id);
-            const available = valuesFor(records, field);
-            const stillSelected = new Set([...selected].filter(value => available.includes(value)));
-            selected.clear();
-            stillSelected.forEach(value => selected.add(value));
-            select.innerHTML = "";
-            available.forEach(value => {
-                const option = document.createElement("option");
-                option.value = value;
-                option.textContent = value;
-                option.selected = stillSelected.has(value);
-                select.appendChild(option);
-            });
-        });
-        updateFilterCounts();
-    }
-
-    function updateFilterCounts() {
-        const appCount = selectedApplications.size;
-        const componentCount = selectedComponents.size;
-        document.getElementById("application-filter-count").textContent = `(${appCount} sélectionnée${appCount > 1 ? "s" : ""})`;
-        document.getElementById("component-filter-count").textContent = `(${componentCount} sélectionné${componentCount > 1 ? "s" : ""})`;
-    }
-
-    function filteredRecords(records) {
-        return records.filter(row =>
-            (!selectedApplications.size || selectedApplications.has(displayValue(row[APPLICATION_FIELD]))) &&
-            (!selectedComponents.size || selectedComponents.has(displayValue(row[COMPONENT_FIELD])))
-        );
-    }
-
-    function renderFilteredTables() {
-        const filtered = filteredRecords(currentRecords);
-        generateGroupedTable(filtered, "application", "tbody-by-app");
-        generateGroupedTable(filtered, "composant", "tbody-by-composant");
-        generateEolCriticalTable(filtered);
-        const count = filtered.length;
-        document.getElementById("filtered-row-count").textContent = `(${count} ligne${count > 1 ? "s" : ""} affichée${count > 1 ? "s" : ""})`;
-    }
-
-    function setRecords(records) {
-        currentRecords = Array.isArray(records) ? records : [];
-        refreshFilterOptions(currentRecords);
-        renderFilteredTables();
-    }
-
-    function init() {
-        ["application-filter", "component-filter"].forEach(id => {
-            document.getElementById(id).addEventListener("change", event => {
-                const target = event.target;
-                const selected = selectedValues(target);
-                (id === "application-filter" ? selectedApplications : selectedComponents).clear();
-                selected.forEach(value => (id === "application-filter" ? selectedApplications : selectedComponents).add(value));
-                updateFilterCounts();
-                renderFilteredTables();
-            });
-        });
-        document.getElementById("clear-filters").addEventListener("click", () => {
-            selectedApplications.clear();
-            selectedComponents.clear();
-            refreshFilterOptions(currentRecords);
-            renderFilteredTables();
-        });
-    }
-
-    // Réception des changements de la table liée, sans supprimer le chargement initial.
-    if (grist.onRecords) {
-        grist.onRecords(records => setRecords(records));
-    }
-	
-    // Fonction pour formater une date en DD/MM/YYYY
-    function formatDate(dateStr) {
-        if (!dateStr) return "N/A";
-        const date = new Date(dateStr);
-        return date.toLocaleDateString("fr-FR");
-    }
-
-    // Fonction pour calculer les jours restants avant EOL
-    function getDaysLeft(eolDateStr) {
-        if (!eolDateStr) return "N/A";
-        const eolDate = new Date(eolDateStr);
-        const today = new Date();
-        const diffTime = eolDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays >= 0 ? diffDays : "Dépassée";
-    }
 
 
-    // Fonction pour déterminer la classe CSS en fonction de l'alerte
-    function getEolAlertClass(alertLvl) {
-      switch(alertLvl) {
-        case "1" :
-          return "eol-critical";
-		  break;
-        case "2" :
-          return "eol-warning";
-		  break;
-        default:
-          return "eol-ok";
-      }
-    }
-	
-    // Fonction pour retourner le picto en fonction de l'alerte
-    function getEolAlertPicto(alertLvl) {
-      switch(alertLvl) {
-        case "1" :
-          return "🚨";
-		  break;
-        case "2" :
-          return "⚠️";
-		  break;
-        default:
-          return "✅";
-      }
-    }
+// Récupérer les données de la table 
+grist.ready({ requiredAccess: "read table" });
+const tableData = grist.fetchSelectedTable()	
 
-    // Fonction pour générer un tableau groupé
-        function generateGroupedTable(data, groupBy, groupName, tbodyId) {
-        if (tbodyId === undefined) tbodyId = groupName;
-		
-		// Mapping des clés logiques vers les vrais champs Grist
-        const GROUP_FIELDS = {
-            application: "NOM_APPLICATION",
-            composant: "NOM_COMPOSANT"
-        };
-        const groupField = GROUP_FIELDS[groupBy] || groupBy;
+// Récupère les données de la table APPLICATIONS
+const applicationsData = grist.fetchTable("APPLICATIONS"); // Table APPLICATIONS
 
-        const cmpStr = (x, y) => {
-            const s1 = x === null || x === undefined ? "" : String(x);
-            const s2 = y === null || y === undefined ? "" : String(y);
-            return s1.localeCompare(s2, "fr");
-        };
 
-        const sortedData = [...data].sort((a, b) => {
-            const groupCmp = cmpStr(a[groupField], b[groupField]);
-            if (groupCmp !== 0) return groupCmp;
-            return cmpStr(a.CURRENT_VERSION_COMPOSANT, b.CURRENT_VERSION_COMPOSANT);
-        });
+// Normalise les données
+Promise.all([tableData, applicationsData]).then(([relations, applications]) => {
+    setRecords(normalizeRows(relations)); // Pour les tableaux existants
+    renderObsolescenceScores(normalizeRows(applications));
+});
 
-        const tbody = document.getElementById(tbodyId);
-        tbody.innerHTML = "";
+// Fonction pour afficher les scores d'obsolescence
+function renderObsolescenceScores(applications) {
+    const dObs = document.getElementById("obsolescence");
+    dObs.innerHTML = "";
 
-        let currentGroup = null;
-        let firstRowOfCurrentGroup = null;
-        let groupRowCount = 0;
+/*<div class="obsRow">
+	<div class="ObsApp">ALPHA</div>
+	<div class="obsolescence-ban A">
+		<p class="banner__text"></p>
+	</div>
+</div>*/
+    applications.forEach(app => {
+        const row = document.createElement("div");
+				row.className = "obsRow";
+				
+        const dApp = document.createElement("div");
+				dApp.className = "ObsApp";
+				dApp.textContent = app.INTITULE;
+        row.appendChild(dApp);
+				
+        const dScore = document.createElement("div");
+        dScore.className = "obsolescence-ban "+app.ScoreObs;
+				dScore.innerHTML = '<p class="banner__text"></p>';
+        dApp.appendChild(dScore);
+    });
+}
 
-        sortedData.forEach(row => {
-            const groupValue = row[groupField];
+// Données et état des filtres. Les noms de champs correspondent aux colonnes Grist.
+let currentRecords = [];
+const APPLICATION_FIELD = "NOM_APPLICATION";
+const COMPONENT_FIELD = "NOM_COMPOSANT";
+const selectedApplications = new Set();
+const selectedComponents = new Set();
 
-            if (groupValue !== currentGroup) {
-                // Poser le rowSpan sur la PREMIÈRE ligne du groupe précédent
-                if (firstRowOfCurrentGroup !== null) {
-                    firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
-                }
-                // Nouveau groupe
-                currentGroup = groupValue;
-                groupRowCount = 0;
+function displayValue(value) {
+		return value === null || value === undefined || value === "" ? "(vide)" : String(value);
+}
 
-                const tr = document.createElement("tr");
-                //tr.className = getEolAlertClass(row.ALERTE);
+function valuesFor(records, field) {
+		return [...new Set(records.map(row => displayValue(row[field])))].sort((a, b) => a.localeCompare(b, "fr"));
+}
 
-                const tdGroup = document.createElement("td");
-                tdGroup.textContent = groupValue === null || groupValue === undefined ? "(vide)" : String(groupValue);
-                tdGroup.style.fontWeight = "bold";
-                tr.appendChild(tdGroup);
+function selectedValues(select) {
+		return new Set([...select.selectedOptions].map(option => option.value));
+}
 
-                tbody.appendChild(tr);
-                firstRowOfCurrentGroup = tr;
-            } else {
-                const tr = document.createElement("tr");
-                //tr.className = getEolAlertClass(row.ALERTE);
-                tbody.appendChild(tr);
-            }
+function refreshFilterOptions(records) {
+		const configs = [
+				["application-filter", APPLICATION_FIELD, selectedApplications],
+				["component-filter", COMPONENT_FIELD, selectedComponents]
+		];
+		configs.forEach(([id, field, selected]) => {
+				const select = document.getElementById(id);
+				const available = valuesFor(records, field);
+				const stillSelected = new Set([...selected].filter(value => available.includes(value)));
+				selected.clear();
+				stillSelected.forEach(value => selected.add(value));
+				select.innerHTML = "";
+				available.forEach(value => {
+						const option = document.createElement("option");
+						option.value = value;
+						option.textContent = value;
+						option.selected = stillSelected.has(value);
+						select.appendChild(option);
+				});
+		});
+		updateFilterCounts();
+}
 
-            groupRowCount++;
-            // On complète la ligne courante (la dernière ajoutée au tbody)
-            const tr = tbody.lastElementChild;
+function updateFilterCounts() {
+		const appCount = selectedApplications.size;
+		const componentCount = selectedComponents.size;
+		document.getElementById("application-filter-count").textContent = `(${appCount} sélectionnée${appCount > 1 ? "s" : ""})`;
+		document.getElementById("component-filter-count").textContent = `(${componentCount} sélectionné${componentCount > 1 ? "s" : ""})`;
+}
 
-            const tdPicto = document.createElement("td");
-            tdPicto.textContent = getEolAlertPicto(row.ALERTE);
-			tdPicto.className = getEolAlertClass(row.ALERTE)+"-pic";
-            tr.appendChild(tdPicto);
+function filteredRecords(records) {
+		return records.filter(row =>
+				(!selectedApplications.size || selectedApplications.has(displayValue(row[APPLICATION_FIELD]))) &&
+				(!selectedComponents.size || selectedComponents.has(displayValue(row[COMPONENT_FIELD])))
+		);
+}
 
-            const tdComposant = document.createElement("td");
-            tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
-			tdComposant.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdComposant);
+function renderFilteredTables() {
+		const filtered = filteredRecords(currentRecords);
+		generateGroupedTable(filtered, "application", "tbody-by-app");
+		generateGroupedTable(filtered, "composant", "tbody-by-composant");
+		generateEolCriticalTable(filtered);
+		const count = filtered.length;
+		document.getElementById("filtered-row-count").textContent = `(${count} ligne${count > 1 ? "s" : ""} affichée${count > 1 ? "s" : ""})`;
+}
 
-            const tdVersion = document.createElement("td");
-			if (row.ALERTE == "5" && row.LTS) {
-				tdVersion.innerHTML = row.CURRENT_VERSION_COMPOSANT + ' <span class="lts">(LTS)</span>';	
-			}
-			else {
-			    tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
-			}
-            //tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
-			tdVersion.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdVersion);
+function setRecords(records) {
+		currentRecords = Array.isArray(records) ? records : [];
+		refreshFilterOptions(currentRecords);
+		renderFilteredTables();
+}
 
-            const tdEol = document.createElement("td");
-            tdEol.textContent = formatDate(row.RELEASE_EOL_DATE_AFFICHEE);
-			tdEol.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdEol);
+function init() {
+		["application-filter", "component-filter"].forEach(id => {
+				document.getElementById(id).addEventListener("change", event => {
+						const target = event.target;
+						const selected = selectedValues(target);
+						(id === "application-filter" ? selectedApplications : selectedComponents).clear();
+						selected.forEach(value => (id === "application-filter" ? selectedApplications : selectedComponents).add(value));
+						updateFilterCounts();
+						renderFilteredTables();
+				});
+		});
+		document.getElementById("clear-filters").addEventListener("click", () => {
+				selectedApplications.clear();
+				selectedComponents.clear();
+				refreshFilterOptions(currentRecords);
+				renderFilteredTables();
+		});
+}
 
-            const tdVersionCible = document.createElement("td");
-            tdVersionCible.textContent = row.RELEASE_CIBLE;
-			tdVersionCible.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdVersionCible);
+// Réception des changements de la table liée, sans supprimer le chargement initial.
+if (grist.onRecords) {
+		grist.onRecords(records => setRecords(records));
+}
 
-            const tdEolCible = document.createElement("td");
-            tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
-			tdEolCible.className = getEolAlertClass(row.ALERTE);
-            tr.appendChild(tdEolCible);
-        });
+// Fonction pour formater une date en DD/MM/YYYY
+function formatDate(dateStr) {
+		if (!dateStr) return "N/A";
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("fr-FR");
+}
 
-        // Fermer le dernier groupe
-        if (firstRowOfCurrentGroup !== null) {
-            firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
-        }
-    }
+// Fonction pour calculer les jours restants avant EOL
+function getDaysLeft(eolDateStr) {
+		if (!eolDateStr) return "N/A";
+		const eolDate = new Date(eolDateStr);
+		const today = new Date();
+		const diffTime = eolDate - today;
+		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+		return diffDays >= 0 ? diffDays : "Dépassée";
+}
 
-    // Fonction pour générer le tableau EOL critique
-    function generateEolCriticalTable(data) {
-        const criticalData = data.filter(row => Number(row.ALERTE) === 1 || Number(row.ALERTE) === 2);
 
-        const tbody = document.getElementById("tbody-eol-critical");
-        tbody.innerHTML = "";
-        criticalData.forEach(row => {
-            const tr = document.createElement("tr");
-            tr.className = getEolAlertClass(row.ALERTE)+"-crit";
+// Fonction pour déterminer la classe CSS en fonction de l'alerte
+function getEolAlertClass(alertLvl) {
+	switch(alertLvl) {
+		case "1" :
+			return "eol-critical";
+	break;
+		case "2" :
+			return "eol-warning";
+	break;
+		default:
+			return "eol-ok";
+	}
+}
 
-            const addCell = (text) => {
-                const td = document.createElement("td");
-                td.textContent = text === null || text === undefined ? "" : String(text);
-                tr.appendChild(td);
-            };
+// Fonction pour retourner le picto en fonction de l'alerte
+function getEolAlertPicto(alertLvl) {
+	switch(alertLvl) {
+		case "1" :
+			return "🚨";
+	break;
+		case "2" :
+			return "⚠️";
+	break;
+		default:
+			return "✅";
+	}
+}
 
-            addCell(row.NOM_APPLICATION);
-            addCell(row.NOM_COMPOSANT);
-            addCell(row.CURRENT_VERSION_COMPOSANT);
-            addCell(formatDate(row.RELEASE_EOL_DATE_AFFICHEE));
-            addCell(row.RELEASE_CIBLE);
-            addCell(formatDate(row.RELEASE_CIBLE_DATE));
-            addCell(Number(row.ALERTE) === 1 ? "Dépassée" : "< 4 mois");
+// Fonction pour générer un tableau groupé
+		function generateGroupedTable(data, groupBy, groupName, tbodyId) {
+		if (tbodyId === undefined) tbodyId = groupName;
 
-            tbody.appendChild(tr);
-        });
-    }
+// Mapping des clés logiques vers les vrais champs Grist
+		const GROUP_FIELDS = {
+				application: "NOM_APPLICATION",
+				composant: "NOM_COMPOSANT"
+		};
+		const groupField = GROUP_FIELDS[groupBy] || groupBy;
 
-    // Fonction pour afficher un onglet
-    function showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        document.getElementById(tabId).classList.add('active');
-    }
+		const cmpStr = (x, y) => {
+				const s1 = x === null || x === undefined ? "" : String(x);
+				const s2 = y === null || y === undefined ? "" : String(y);
+				return s1.localeCompare(s2, "fr");
+		};
 
-   // --- Initialisation ---
-    document.addEventListener("DOMContentLoaded", init);
+		const sortedData = [...data].sort((a, b) => {
+				const groupCmp = cmpStr(a[groupField], b[groupField]);
+				if (groupCmp !== 0) return groupCmp;
+				return cmpStr(a.CURRENT_VERSION_COMPOSANT, b.CURRENT_VERSION_COMPOSANT);
+		});
 
-    function normalizeRows(raw) {
-        // Format "columns" : { col1: [...], col2: [...] } → tableau de lignes
-        if (raw && !Array.isArray(raw) && typeof raw === "object") {
-            const cols = Object.keys(raw);
-            if (cols.length && Array.isArray(raw[cols[0]])) {
-                return raw[cols[0]].map((_, i) => {
-                    const row = {};
-                    cols.forEach(c => row[c] = raw[c][i]);
-                    return row;
-                });
-            }
-            return [raw]; // ligne unique transmise comme objet
-        }
-        return Array.isArray(raw) ? raw : [];
-    }
+		const tbody = document.getElementById(tbodyId);
+		tbody.innerHTML = "";
 
-    if (typeof tableData?.then === "function") {
-        tableData.then(d => setRecords(normalizeRows(d)))
-                 .catch(err => console.error("Chargement Grist :", err));
-    }
-    if (grist.onRecords) {
-        grist.onRecords(records => setRecords(normalizeRows(records)));
-    }
+		let currentGroup = null;
+		let firstRowOfCurrentGroup = null;
+		let groupRowCount = 0;
+
+		sortedData.forEach(row => {
+				const groupValue = row[groupField];
+
+				if (groupValue !== currentGroup) {
+						// Poser le rowSpan sur la PREMIÈRE ligne du groupe précédent
+						if (firstRowOfCurrentGroup !== null) {
+								firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
+						}
+						// Nouveau groupe
+						currentGroup = groupValue;
+						groupRowCount = 0;
+
+						const tr = document.createElement("tr");
+						//tr.className = getEolAlertClass(row.ALERTE);
+
+						const tdGroup = document.createElement("td");
+						tdGroup.textContent = groupValue === null || groupValue === undefined ? "(vide)" : String(groupValue);
+						tdGroup.style.fontWeight = "bold";
+						tr.appendChild(tdGroup);
+
+						tbody.appendChild(tr);
+						firstRowOfCurrentGroup = tr;
+				} else {
+						const tr = document.createElement("tr");
+						//tr.className = getEolAlertClass(row.ALERTE);
+						tbody.appendChild(tr);
+				}
+
+				groupRowCount++;
+				// On complète la ligne courante (la dernière ajoutée au tbody)
+				const tr = tbody.lastElementChild;
+
+				const tdPicto = document.createElement("td");
+				tdPicto.textContent = getEolAlertPicto(row.ALERTE);
+	tdPicto.className = getEolAlertClass(row.ALERTE)+"-pic";
+				tr.appendChild(tdPicto);
+
+				const tdComposant = document.createElement("td");
+				tdComposant.textContent = groupBy === "application" ? row.NOM_COMPOSANT : row.NOM_APPLICATION;
+	tdComposant.className = getEolAlertClass(row.ALERTE);
+				tr.appendChild(tdComposant);
+
+				const tdVersion = document.createElement("td");
+	if (row.ALERTE == "5" && row.LTS) {
+		tdVersion.innerHTML = row.CURRENT_VERSION_COMPOSANT + ' <span class="lts">(LTS)</span>';	
+	}
+	else {
+			tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+	}
+				//tdVersion.textContent = row.CURRENT_VERSION_COMPOSANT;
+	tdVersion.className = getEolAlertClass(row.ALERTE);
+				tr.appendChild(tdVersion);
+
+				const tdEol = document.createElement("td");
+				tdEol.textContent = formatDate(row.RELEASE_EOL_DATE_AFFICHEE);
+	tdEol.className = getEolAlertClass(row.ALERTE);
+				tr.appendChild(tdEol);
+
+				const tdVersionCible = document.createElement("td");
+				tdVersionCible.textContent = row.RELEASE_CIBLE;
+	tdVersionCible.className = getEolAlertClass(row.ALERTE);
+				tr.appendChild(tdVersionCible);
+
+				const tdEolCible = document.createElement("td");
+				tdEolCible.textContent = formatDate(row.RELEASE_CIBLE_DATE);
+	tdEolCible.className = getEolAlertClass(row.ALERTE);
+				tr.appendChild(tdEolCible);
+		});
+
+		// Fermer le dernier groupe
+		if (firstRowOfCurrentGroup !== null) {
+				firstRowOfCurrentGroup.firstElementChild.rowSpan = groupRowCount;
+		}
+}
+
+// Fonction pour générer le tableau EOL critique
+function generateEolCriticalTable(data) {
+		const criticalData = data.filter(row => Number(row.ALERTE) === 1 || Number(row.ALERTE) === 2);
+
+		const tbody = document.getElementById("tbody-eol-critical");
+		tbody.innerHTML = "";
+		criticalData.forEach(row => {
+				const tr = document.createElement("tr");
+				tr.className = getEolAlertClass(row.ALERTE)+"-crit";
+
+				const addCell = (text) => {
+						const td = document.createElement("td");
+						td.textContent = text === null || text === undefined ? "" : String(text);
+						tr.appendChild(td);
+				};
+
+				addCell(row.NOM_APPLICATION);
+				addCell(row.NOM_COMPOSANT);
+				addCell(row.CURRENT_VERSION_COMPOSANT);
+				addCell(formatDate(row.RELEASE_EOL_DATE_AFFICHEE));
+				addCell(row.RELEASE_CIBLE);
+				addCell(formatDate(row.RELEASE_CIBLE_DATE));
+				addCell(Number(row.ALERTE) === 1 ? "Dépassée" : "< 4 mois");
+
+				tbody.appendChild(tr);
+		});
+}
+
+// Fonction pour afficher un onglet
+function showTab(tabId) {
+		document.querySelectorAll('.tab-content').forEach(tab => {
+				tab.classList.remove('active');
+		});
+		document.getElementById(tabId).classList.add('active');
+}
+
+// --- Initialisation ---
+document.addEventListener("DOMContentLoaded", init);
+
+function normalizeRows(raw) {
+		// Format "columns" : { col1: [...], col2: [...] } → tableau de lignes
+		if (raw && !Array.isArray(raw) && typeof raw === "object") {
+				const cols = Object.keys(raw);
+				if (cols.length && Array.isArray(raw[cols[0]])) {
+						return raw[cols[0]].map((_, i) => {
+								const row = {};
+								cols.forEach(c => row[c] = raw[c][i]);
+								return row;
+						});
+				}
+				return [raw]; // ligne unique transmise comme objet
+		}
+		return Array.isArray(raw) ? raw : [];
+}
+
+if (typeof tableData?.then === "function") {
+		tableData.then(d => setRecords(normalizeRows(d)))
+						 .catch(err => console.error("Chargement Grist :", err));
+}
+if (grist.onRecords) {
+		grist.onRecords(records => setRecords(normalizeRows(records)));
+}
 </script>
   </div>
 </body>

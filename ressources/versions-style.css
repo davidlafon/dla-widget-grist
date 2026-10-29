@@ -245,7 +245,7 @@ h1 {
 
 /* Filtres multi-sélection */
 .filter-bar {
-	display: flex;
+	display: inline-flex;
 	flex-wrap: wrap;
 	align-items: flex-end;
 	gap: 12px;
@@ -300,4 +300,93 @@ h1 {
 
 .filter-side .filter-count {
 	margin-top: 10px;
+}
+
+.obsolescence-tab {
+	display: inline-flex;
+    flex-: flex-end;
+    /* align-items: flex-end; */
+    gap: 0px;
+    margin: 0px 15px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa;
+    max-width: 650px;
+}
+
+
+	/* -------------------------------------------------
+   Style global de la bannière
+   ------------------------------------------------- */
+.obsolescence-ban {
+	position: relative;                /* nécessaire pour le ::after  */
+  display: inline-block;             /* s’ajuste à la largeur du texte */
+  max-width: 100%;                   /* ne déborde pas sur les petits écrans */
+  padding: 0.3rem 1.5rem;            /* espace intérieur */
+  color: #000;                       /* couleur du texte */
+  font-family: system-ui, sans-serif;
+  line-height: 0.8;
+  border-radius: 4px 0 0 4px;        /* coins arrondis sauf à droite */
+	min-width: 100px;
+}
+
+/* -------------------------------------------------
+   Pointe à droite (triangle)
+   ------------------------------------------------- */
+.obsolescence-ban::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -1rem;                    /* décale la pointe hors du bloc */
+  width: 0;
+  height: 0;
+  border-top: 0.7rem solid transparent;
+  border-bottom: 0.7rem solid transparent;
+	display: block;
+}
+
+.banner__text {
+  margin: 0;                         /* on enlève la marge par défaut du <p> */
+}
+/* Score A  */
+.obsolescence-ban.A {background: #008000; min-width:80px;}
+.obsolescence-ban.A::after {border-left: 1rem solid #008000;}
+.obsolescence-ban.A .banner__text::after {content: "A - Aucun";}
+
+/* Score B  */
+.obsolescence-ban.B {background: #33cc33; min-width:100px;}
+.obsolescence-ban.B::after {border-left: 1rem solid #33cc33;}
+.obsolescence-ban.B .banner__text::after {content: "B - Léger";}
+
+/* Score C  */
+.obsolescence-ban.C {background: #ffff00; min-width:120px;}
+.obsolescence-ban.C::after {border-left: 1rem solid #ffff00;}
+.obsolescence-ban.C .banner__text::after {content: "C - Moyen";}
+
+/* Score D  */
+.obsolescence-ban.D {background: #e46c0a; min-width:140px;}
+.obsolescence-ban.D::after {border-left: 1rem solid #e46c0a;}
+.obsolescence-ban.D .banner__text::after {content: "D - Elevé";}
+
+/* Score E  */
+.obsolescence-ban.E {background: #c00000; min-width:160px;}
+.obsolescence-ban.E::after {border-left: 1rem solid #c00000;}
+.obsolescence-ban.E .banner__text::after {content: "E - Très élevé";}
+
+/* Score 0  */
+.obsolescence-ban.F {background: #beb9b6; min-width:160px;}
+.obsolescence-ban.F::after {border-left: 1rem solid #beb9b6;}
+.obsolescence-ban.F .banner__text::after {content: "0 - Inconnu";}
+
+.obsRow {
+	display: flex;
+  flex-direction: row;
+	padding: 3px 0px;
+  border-top: 1px solid #DDD;
+}
+.obsRow:last-child {border-bottom: 1px solid #DDD;}
+.ObsApp {
+   width: 100px;
+	 line-height: 1.4rem;
 }
