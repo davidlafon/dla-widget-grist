@@ -130,7 +130,7 @@ Promise.all([tableData, applicationsData]).then(([relations, applications]) => {
 // Fonction pour afficher les scores d'obsolescence
 function renderObsolescenceScores(applications) {
     const dObs = document.getElementById("obsolescence");
-    dObs.innerHTML = "";
+    dObs.innerHTML = '<div class="obsTitle">Obsolescence</div>';
 		const dCol1 = document.createElement("div");
 		dCol1.className = "obsCol";
 		const dCol2 = document.createElement("div");

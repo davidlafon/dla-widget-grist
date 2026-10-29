@@ -268,7 +268,7 @@ h1 {
 	color: #333;
 }
 .filter-control select {
-	min-height: 72px;
+	min-height: 178px;
 	padding: 4px;
 	border: 1px solid #bbb;
 	border-radius: 4px;
@@ -314,6 +314,15 @@ h1 {
 	width: 650px;
   font-size: 0.7rem;
 }
+
+.obsTitle {
+	flex: stretch;
+	font-variant-caps: small-caps;
+	font-weight: 700;
+	font-size: small;
+	margin-bottom: 5px;
+}
+
 
 .obsRow {
 	padding: 3px 0px;
