@@ -118,7 +118,7 @@ grist.ready({ requiredAccess: "read table" });
 const tableData = grist.fetchSelectedTable()	
 
 // Récupère les données de la table APPLICATIONS
-const applicationsData = grist.fetchTable("APPLICATIONS"); // Table APPLICATIONS
+const applicationsData = grist.docApi.fetchTable("APPLICATIONS");
 
 
 // Normalise les données
