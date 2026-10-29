@@ -129,18 +129,20 @@ Promise.all([tableData, applicationsData]).then(([relations, applications]) => {
 
 // Fonction pour afficher les scores d'obsolescence
 function renderObsolescenceScores(applications) {
-console.log("renderObsolescenceScores");
     const dObs = document.getElementById("obsolescence");
     dObs.innerHTML = "";
-
-/*<div class="obsRow">
-	<div class="ObsApp">ALPHA</div>
-	<div class="obsolescence-ban A">
-		<p class="banner__text"></p>
-	</div>
-</div>*/
+		const dCol1 = document.createElement("div");
+		dCol1.className = "obsCol";
+		const dCol2 = document.createElement("div");
+		dCol2.className = "obsCol";
+		
+		const nbApps = applications.length;
+		console.log("nbApps = %s", applications.length);
+		var i=0;
+		
     applications.forEach(app => {
-				console.log("app : %s | Score : %s", app.INTITULE, app.ScoreObs); 
+				i++;
+				console.log("i : %s | Score : %s", i, app.ScoreObs); 
         const dRow = document.createElement("div");
 				dRow.className = "obsRow";
 				
@@ -150,11 +152,18 @@ console.log("renderObsolescenceScores");
 				
         const dScore = document.createElement("div");
         dScore.className = "obsolescence-ban "+app.ScoreObs;
-				dScore.innerHTML = '<p class="banner__text"></p>';
+				dScore.innerHTML = '<p class="banner__text"> ('+app.Degre_d_obsolescence+')</p>';
 				
         dRow.appendChild(dApp);
         dRow.appendChild(dScore);
 				dObs.appendChild(dRow);
+				
+				if (i <= Math.floor(nbApps / 2)) {
+					dCol1.appendChild(dRow);
+				}
+				else if (i>Math.floor(nbApps / 2)) {
+					dCol2.appendChild(dRow);
+				}
     });
 }
 
