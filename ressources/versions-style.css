@@ -330,6 +330,7 @@ h1 {
 
 .filter-side .filter-count {
 	margin-top: 10px;
+	text-align: center;
 }
 
 .obsolescence-tab {
