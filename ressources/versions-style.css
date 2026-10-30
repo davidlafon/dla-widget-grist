@@ -240,13 +240,6 @@ h1 {
 
 /* Filtres multi-sélection */
 /* Toggle filtres */
-.filter-zone {
-  background: #f5f5f5;
-  padding: 0px;
-  border-radius: 5px;
-  margin-top: 10px;
-  transition: all 0.3s ease; /* Animation fluide */
-}
 
 .filter-zone {
 	background: #f5f5f5;
@@ -255,7 +248,7 @@ h1 {
   margin-top: 10px;
   max-height: 250px;
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
+  transition: max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
   opacity: 1;
 }
 
