@@ -126,6 +126,7 @@ btnInit.addEventListener('click', async () => {
 
           actions.push(['AddRecord', 'VERSIONS', null, {
             ID_RELEASE: idRelease,
+            ID_COMPOSANT: idComposant,
             CREATION_DATE: today,
             RELEASE_VERSION: rel.name || '',
             RELEASE_DATE: dateToTimestamp(rel.releaseDate),
@@ -195,6 +196,7 @@ btnUpdate.addEventListener('click', async () => {
           null,
           {
             ID_RELEASE: idRelease,
+            ID_COMPOSANT: idComposant,
             CREATION_DATE: generatedAt,
             RELEASE_VERSION: result.name || '',
             RELEASE_DATE: dateToTimestamp(result.releaseDate),
