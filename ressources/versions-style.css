@@ -394,8 +394,8 @@ h1 {
   right: -1rem;                    /* décale la pointe hors du bloc */
   width: 0;
   height: 0;
-  border-top: 0.6rem solid transparent;
-  border-bottom: 0.65rem solid transparent;
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.6rem solid transparent;
 	display: block;
 }
 
