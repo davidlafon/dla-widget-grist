@@ -337,13 +337,13 @@ h1 {
 	display: inline-flex;
 	flex-wrap: wrap;
 	gap: 0px;
-	margin: 0px 15px;
+	margin: 0px 10px;
 	padding: 12px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
 	background-color: #fafafa;
-	width: 650px;
-  font-size: 0.7rem;
+	width: 550px;
+  font-size: 0.55rem;
 }
 
 .obsTitle {
@@ -361,7 +361,7 @@ h1 {
 }
 .obsRow:last-child {border-bottom: 1px solid #DDD;}
 .ObsApp {
-   width: 100px;
+   width: 4.2rem;
 	 line-height: 1.4rem;
 	 display: inline-block;
 }
@@ -376,12 +376,13 @@ h1 {
 	position: relative;                /* nécessaire pour le ::after  */
   display: inline-block;             /* s’ajuste à la largeur du texte */
   max-width: 100%;                   /* ne déborde pas sur les petits écrans */
-  padding: 0.3rem 1.5rem;            /* espace intérieur */
+  padding: 0.3rem 0.5rem;            /* espace intérieur */
   color: #000;                       /* couleur du texte */
   font-family: system-ui, sans-serif;
   line-height: 0.8;
   border-radius: 4px 0 0 4px;        /* coins arrondis sauf à droite */
 	min-width: 100px;
+	height: 17px;
 }
 /* -------------------------------------------------
    Pointe à droite (triangle)
@@ -402,27 +403,27 @@ h1 {
   margin: 0;                         /* on enlève la marge par défaut du <p> */
 }
 /* Score A  */
-.obsolescence-ban.A {background: #008000; min-width:80px;}
+.obsolescence-ban.A {background: #008000; min-width:72px;}
 .obsolescence-ban.A::after {border-left: 1rem solid #008000;}
 .obsolescence-ban.A .banner__text::before {content: "A - Aucun";}
 
 /* Score B  */
-.obsolescence-ban.B {background: #33cc33; min-width:100px;}
+.obsolescence-ban.B {background: #33cc33; min-width:85px;}
 .obsolescence-ban.B::after {border-left: 1rem solid #33cc33;}
 .obsolescence-ban.B .banner__text::before {content: "B - Léger";}
 
 /* Score C  */
-.obsolescence-ban.C {background: #ffff00; min-width:120px;}
+.obsolescence-ban.C {background: #ffff00; min-width:100px;}
 .obsolescence-ban.C::after {border-left: 1rem solid #ffff00;}
 .obsolescence-ban.C .banner__text::before {content: "C - Moyen";}
 
 /* Score D  */
-.obsolescence-ban.D {background: #e46c0a; min-width:140px;}
+.obsolescence-ban.D {background: #e46c0a; min-width:115px;}
 .obsolescence-ban.D::after {border-left: 1rem solid #e46c0a;}
 .obsolescence-ban.D .banner__text::before {content: "D - Elevé";}
 
 /* Score E  */
-.obsolescence-ban.E {background: #c00000; min-width:160px;}
+.obsolescence-ban.E {background: #c00000; min-width:130px; color: #FFF;}
 .obsolescence-ban.E::after {border-left: 1rem solid #c00000;}
 .obsolescence-ban.E .banner__text::before {content: "E - Très élevé";}
 
